@@ -1,4 +1,5 @@
-import { Button } from '@nextui-org/react';
+import { SignedIn, UserButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -7,9 +8,9 @@ import LocaleSwitcher from '@/components/LocaleSwitcher';
 import { MainLayout } from '@/templates/MainLayout';
 import { AppConfig } from '@/utils/AppConfig';
 
-export default function Layout(props: { children: React.ReactNode }) {
-  const t = useTranslations('RootLayout');
-
+export default function AppLayout(props: { children: React.ReactNode }) {
+  const { userId } = auth();
+  const t = useTranslations('YourWork');
   return (
     <MainLayout
       leftNav={
@@ -29,35 +30,23 @@ export default function Layout(props: { children: React.ReactNode }) {
           </Link>
 
           <Link
-            href="/about/"
+            href={`/u/${userId}/your-work`}
             className="font-semibold text-black hover:text-primary-10"
           >
-            {t('about_link')}
+            {t('your_work')}
           </Link>
         </>
       }
       rightNav={
         <>
-          <Link href="/sign-in/">
-            <Button
-              variant="light"
-              className="font-semibold text-black hover:text-primary-10"
-            >
-              {t('sign_in_link')}
-            </Button>
-          </Link>
-
-          <Link href="/sign-up/">
-            <Button color="primary" variant="solid" className="font-semibold">
-              {t('sign_up_link')}
-            </Button>
-          </Link>
-
           <LocaleSwitcher />
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </>
       }
     >
-      <div>{props.children}</div>
+      {props.children}
     </MainLayout>
   );
 }

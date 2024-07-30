@@ -1,10 +1,10 @@
 import '@/styles/global.css';
 
+import { NextUIProvider } from '@nextui-org/react';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { NextIntlClientProvider, useMessages } from 'next-intl';
 
-import { DemoBadge } from '@/components/DemoBadge';
 import { AppConfig } from '@/utils/AppConfig';
 
 export const metadata: Metadata = {
@@ -49,9 +49,7 @@ export default function RootLayout(props: {
           locale={props.params.locale}
           messages={messages}
         >
-          {props.children}
-
-          <DemoBadge />
+          <NextUIProvider>{props.children}</NextUIProvider>
         </NextIntlClientProvider>
       </body>
     </html>

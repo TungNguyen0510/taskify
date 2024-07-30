@@ -10,10 +10,7 @@ const intlMiddleware = createMiddleware({
   defaultLocale: AppConfig.defaultLocale,
 });
 
-const isProtectedRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/:locale/dashboard(.*)',
-]);
+const isProtectedRoute = createRouteMatcher(['/u(.*)', '/:locale/u(.*)']);
 
 export default function middleware(
   request: NextRequest,
@@ -27,8 +24,7 @@ export default function middleware(
   ) {
     return clerkMiddleware((auth, req) => {
       if (isProtectedRoute(req)) {
-        const locale =
-          req.nextUrl.pathname.match(/(\/.*)\/dashboard/)?.at(1) ?? '';
+        const locale = req.nextUrl.pathname.match(/(\/.*)\/[^/]+/)?.at(1) ?? '';
 
         const signInUrl = new URL(`${locale}/sign-in`, req.url);
 

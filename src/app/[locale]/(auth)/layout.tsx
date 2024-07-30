@@ -1,23 +1,26 @@
-import { enUS, frFR } from '@clerk/localizations';
+import { enUS, viVN } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 
 export default function AuthLayout(props: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  let clerkLocale = enUS;
+  const { userId } = auth();
+
+  let clerkLocale = viVN;
   let signInUrl = '/sign-in';
   let signUpUrl = '/sign-up';
-  let dashboardUrl = '/dashboard';
+  let appUrl = `/u/${userId}/your-work`;
 
-  if (props.params.locale === 'fr') {
-    clerkLocale = frFR;
+  if (props.params.locale === 'en') {
+    clerkLocale = enUS;
   }
 
-  if (props.params.locale !== 'en') {
+  if (props.params.locale !== 'vi') {
     signInUrl = `/${props.params.locale}${signInUrl}`;
     signUpUrl = `/${props.params.locale}${signUpUrl}`;
-    dashboardUrl = `/${props.params.locale}${dashboardUrl}`;
+    appUrl = `/${props.params.locale}${appUrl}`;
   }
 
   return (
@@ -25,8 +28,8 @@ export default function AuthLayout(props: {
       localization={clerkLocale}
       signInUrl={signInUrl}
       signUpUrl={signUpUrl}
-      signInFallbackRedirectUrl={dashboardUrl}
-      signUpFallbackRedirectUrl={dashboardUrl}
+      signInFallbackRedirectUrl={appUrl}
+      signUpFallbackRedirectUrl={appUrl}
     >
       {props.children}
     </ClerkProvider>

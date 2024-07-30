@@ -1,5 +1,5 @@
 {
-  "name": "next-js-boilerplate",
+  "name": "taskify",
   "version": "3.53.0",
   "scripts": {
     "dev:spotlight": "spotlight-sidecar",
@@ -31,10 +31,12 @@
     "@electric-sql/pglite": "^0.1.5",
     "@hookform/resolvers": "^3.6.0",
     "@logtail/pino": "^0.4.22",
+    "@nextui-org/react": "^2.4.6",
     "@sentry/nextjs": "^7.118.0",
     "@spotlightjs/spotlight": "^1.2.17",
     "@t3-oss/env-nextjs": "^0.10.1",
     "drizzle-orm": "^0.31.2",
+    "framer-motion": "^11.3.19",
     "next": "^14.2.4",
     "next-intl": "^3.15.2",
     "pg": "^8.12.0",
@@ -44,7 +46,8 @@
     "react-dom": "~18.2.0",
     "react-hook-form": "^7.52.0",
     "sharp": "^0.33.4",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
@@ -147,6 +150,5 @@
       "@semantic-release/git",
       "@semantic-release/github"
     ]
-  },
-  "author": "Ixartz (https://github.com/ixartz)"
+  }
 }
