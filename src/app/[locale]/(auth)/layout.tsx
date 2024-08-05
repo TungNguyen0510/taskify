@@ -1,17 +1,14 @@
 import { enUS, viVN } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 
 export default function AuthLayout(props: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const { userId } = auth();
-
   let clerkLocale = viVN;
   let signInUrl = '/sign-in';
   let signUpUrl = '/sign-up';
-  let appUrl = `/u/${userId}/your-work`;
+  let appUrl = `/u/your-work`;
 
   if (props.params.locale === 'en') {
     clerkLocale = enUS;

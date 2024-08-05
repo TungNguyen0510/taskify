@@ -37,7 +37,7 @@
     "meta_description": "Effortlessly create an account through our intuitive sign-up process."
   },
   "App": {
-    "meta_title": "{userId}",
+    "meta_title": "App - Taskify",
     "hello_message": "Hello {email}!"
   },
   "UserProfile": {
@@ -49,5 +49,11 @@
   },
   "Project": {
     "meta_title": "Project - {projectId}"
+  },
+  "KanbanBoard": {
+    "add_column": "Add column"
+  },
+  "ColumnContainer": {
+    "add_task": "Add task"
   }
 }

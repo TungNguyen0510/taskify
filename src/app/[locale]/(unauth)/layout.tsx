@@ -30,7 +30,7 @@ export default function Layout(props: { children: React.ReactNode }) {
 
           <Link
             href="/about/"
-            className="font-semibold text-black hover:text-primary-10"
+            className="font-semibold text-black hover:text-blue-500"
           >
             {t('about_link')}
           </Link>
@@ -41,14 +41,14 @@ export default function Layout(props: { children: React.ReactNode }) {
           <Link href="/sign-in/">
             <Button
               variant="light"
-              className="font-semibold text-black hover:text-primary-10"
+              className="font-semibold text-black hover:text-blue-500"
             >
               {t('sign_in_link')}
             </Button>
           </Link>
 
           <Link href="/sign-up/">
-            <Button color="primary" variant="solid" className="font-semibold">
+            <Button color="primary" className="font-semibold">
               {t('sign_up_link')}
             </Button>
           </Link>

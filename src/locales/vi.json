@@ -35,7 +35,7 @@
     "meta_description": "Dễ dàng tạo tài khoản thông qua quy trình đăng ký trực quan của chúng tôi."
   },
   "App": {
-    "meta_title": "{userId}",
+    "meta_title": "Ứng dụng - Taskify",
     "hello_message": "Xin chào {email}!"
   },
   "UserProfile": {
@@ -47,5 +47,11 @@
   },
   "Project": {
     "meta_title": "Dự án - {projectId}"
+  },
+  "KanbanBoard": {
+    "add_column": "Thêm cột"
+  },
+  "ColumnContainer": {
+    "add_task": "Thêm công việc"
   }
 }

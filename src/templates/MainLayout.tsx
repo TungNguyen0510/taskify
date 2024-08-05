@@ -1,13 +1,9 @@
-import { useTranslations } from 'next-intl';
-
-import { AppConfig } from '@/utils/AppConfig';
-
 const MainLayout = (props: {
   leftNav: React.ReactNode;
   rightNav?: React.ReactNode;
   children: React.ReactNode;
 }) => {
-  const t = useTranslations('MainLayout');
+  // const t = useTranslations('MainLayout');
 
   return (
     <div className="w-full text-black antialiased">
@@ -32,11 +28,11 @@ const MainLayout = (props: {
 
         <main className="min-h-[calc(100vh-56px)]">{props.children}</main>
 
-        <div className="w-full border-t border-gray-300">
+        {/* <div className="w-full border-t border-gray-300">
           <footer className="mx-auto flex w-full justify-end p-4 text-center text-sm md:w-4/5 xl:w-3/4">
             {t('copyright')} © {new Date().getFullYear()} {AppConfig.name}.
           </footer>
-        </div>
+        </div> */}
       </div>
     </div>
   );

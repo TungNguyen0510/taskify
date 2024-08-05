@@ -1,5 +1,4 @@
 import { SignedIn, UserButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
@@ -9,7 +8,6 @@ import { MainLayout } from '@/templates/MainLayout';
 import { AppConfig } from '@/utils/AppConfig';
 
 export default function AppLayout(props: { children: React.ReactNode }) {
-  const { userId } = auth();
   const t = useTranslations('YourWork');
   return (
     <MainLayout
@@ -30,8 +28,8 @@ export default function AppLayout(props: { children: React.ReactNode }) {
           </Link>
 
           <Link
-            href={`/u/${userId}/your-work`}
-            className="font-semibold text-black hover:text-primary-10"
+            href="/u/your-work"
+            className="font-semibold text-black hover:text-blue-500"
           >
             {t('your_work')}
           </Link>

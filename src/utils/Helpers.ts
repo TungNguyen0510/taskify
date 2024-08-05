@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 import { AppConfig } from './AppConfig';
 
 export const getBaseUrl = () => {
@@ -18,4 +20,8 @@ export const getI18nPath = (url: string, locale: string) => {
   }
 
   return `/${locale}${url}`;
+};
+
+export const generateId = () => {
+  return uuidv4();
 };

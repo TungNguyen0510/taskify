@@ -1,16 +1,10 @@
 'use client';
 
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from '@nextui-org/react';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { Select, SelectItem } from '@nextui-org/react';
 import { useLocale } from 'next-intl';
+import type { ChangeEventHandler } from 'react';
 
+import { usePathname, useRouter } from '@/libs/i18nNavigation';
 import { AppConfig } from '@/utils/AppConfig';
 
 export default function LocaleSwitcher() {
@@ -18,39 +12,23 @@ export default function LocaleSwitcher() {
   const pathname = usePathname();
   const locale = useLocale();
 
-  const handleChange = (value: string) => {
-    router.push(pathname.replace(`/${locale}`, `/${value}`));
+  const handleChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    router.push(pathname, { locale: event.target.value });
     router.refresh();
   };
 
   return (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button color="default" className="size-7">
-          <Image
-            src={`/assets/icons/${locale}.svg`}
-            width={24}
-            height={24}
-            alt=""
-          />
-        </Button>
-      </DropdownTrigger>
-      <DropdownMenu>
-        {AppConfig.locales.map((_locale) => (
-          <DropdownItem
-            key={_locale}
-            value={_locale}
-            onClick={() => handleChange(_locale)}
-          >
-            <Image
-              src={`/assets/icons/${_locale}.svg`}
-              width={24}
-              height={24}
-              alt=""
-            />
-          </DropdownItem>
-        ))}
-      </DropdownMenu>
-    </Dropdown>
+    <Select
+      color="primary"
+      radius="sm"
+      size="sm"
+      className="w-[70px]"
+      defaultSelectedKeys={[`${locale}`]}
+      onChange={handleChange}
+    >
+      {AppConfig.locales.map((_locale) => (
+        <SelectItem key={_locale}>{_locale.toUpperCase()}</SelectItem>
+      ))}
+    </Select>
   );
 }
