@@ -1,3 +1,10 @@
+# 1.0.0 (2024-08-05)
+
+
+### Features
+
+* kanban board mockup ([5dd80bd](https://github.com/TungNguyen0510/taskify/commit/5dd80bd1ea98052d203f70dc3e9aa96767ab999a))
+
 # [3.53.0](https://github.com/ixartz/Next-js-Boilerplate/compare/v3.52.0...v3.53.0) (2024-06-26)
 
 
