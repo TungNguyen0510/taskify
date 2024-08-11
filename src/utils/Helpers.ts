@@ -1,4 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
+import { useColumnsStore } from '@/stores/columns';
+import { useProjectsStore } from '@/stores/projects';
+import { useTasksStore } from '@/stores/tasks';
 
 import { AppConfig } from './AppConfig';
 
@@ -22,6 +24,8 @@ export const getI18nPath = (url: string, locale: string) => {
   return `/${locale}${url}`;
 };
 
-export const generateId = () => {
-  return uuidv4();
+export const resetAllStores = () => {
+  useColumnsStore.getState().reset();
+  useProjectsStore.getState().reset();
+  useTasksStore.getState().reset();
 };

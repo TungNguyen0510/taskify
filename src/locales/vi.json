@@ -43,15 +43,28 @@
   },
   "YourWork": {
     "meta_title": "Công việc của bạn - Taskify",
-    "your_work": "Công việc của bạn"
+    "your_work": "Công việc của bạn",
+    "your_projects": "Các dự án của bạn"
   },
   "Project": {
     "meta_title": "Dự án - {projectId}"
   },
+  "Board": {
+    "meta_title": "Bảng"
+  },
   "KanbanBoard": {
-    "add_column": "Thêm cột"
+    "add_column": "Thêm cột",
+    "col_title_empty": "Tiêu đề cột không thể để trống"
   },
   "ColumnContainer": {
-    "add_task": "Thêm công việc"
+    "add_task": "Thêm công việc",
+    "delete": "Xóa",
+    "create": "Tạo",
+    "delete_column_title": "Xác nhận xóa cột",
+    "delete_column_message": "Bạn có chắc chắn muốn xóa cột này?",
+    "create_task_placeholder": "Bạn cần làm gì ?"
+  },
+  "ConfirmModal": {
+    "cancel": "Hủy bỏ"
   }
 }

@@ -1,3 +1,6 @@
+import { auth } from '@clerk/nextjs/server';
+
 export default function ListPage() {
-  return <div>List Page</div>;
+  const { userId } = auth();
+  return <div>{userId}</div>;
 }

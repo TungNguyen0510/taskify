@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 
+import YourWorkPage from '@/components/YourWork/YourWorkPage';
+
 export async function generateMetadata(props: { params: { locale: string } }) {
   const t = await getTranslations({
     locale: props.params.locale,
@@ -11,6 +13,10 @@ export async function generateMetadata(props: { params: { locale: string } }) {
   };
 }
 
-export default function YourWorkPage() {
-  return <div>Your work</div>;
+export default function YourWork() {
+  return (
+    <div>
+      <YourWorkPage />
+    </div>
+  );
 }

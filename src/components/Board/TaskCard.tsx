@@ -36,11 +36,11 @@ const TaskCard = (props: TaskCardProps) => {
       <Card
         ref={setNodeRef}
         style={style}
-        {...listeners}
-        {...attributes}
+        // {...listeners}
+        // {...attributes}
         radius="sm"
         shadow="sm"
-        className="min-h-20 rounded-sm border border-blue-500 opacity-30"
+        className="min-h-20 rounded-sm border border-blue-500 opacity-80"
       />
     );
   }
@@ -51,13 +51,14 @@ const TaskCard = (props: TaskCardProps) => {
       style={style}
       {...attributes}
       {...listeners}
-      key={task.id}
       radius="sm"
       shadow="sm"
-      className="min-h-20 rounded-sm"
+      className="h-fit min-h-20 rounded-sm hover:bg-blue-100"
     >
       <CardHeader>
-        <div className="text-small hover:underline">{task.name}</div>
+        <p className="text-pretty break-all text-small hover:underline">
+          {task.name}
+        </p>
       </CardHeader>
     </Card>
   );

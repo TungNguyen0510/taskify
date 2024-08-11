@@ -45,15 +45,28 @@
   },
   "YourWork": {
     "meta_title": "Your work - Taskify",
-    "your_work": "Your work"
+    "your_work": "Your work",
+    "your_projects": "Your projects"
   },
   "Project": {
     "meta_title": "Project - {projectId}"
   },
+  "Board": {
+    "meta_title": "Board"
+  },
   "KanbanBoard": {
-    "add_column": "Add column"
+    "add_column": "Add column",
+    "col_title_empty": "Column title cannot be empty"
   },
   "ColumnContainer": {
-    "add_task": "Add task"
+    "add_task": "Add task",
+    "delete": "Delete",
+    "create": "Create",
+    "delete_column_title": "Confirm delete column",
+    "delete_column_message": "Are you sure you want to delete this column?",
+    "create_task_placeholder": "What needs to be done?"
+  },
+  "ConfirmModal": {
+    "cancel": "Cancel"
   }
 }

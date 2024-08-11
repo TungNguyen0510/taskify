@@ -39,7 +39,7 @@ const ProjectLayout = (props: {
 
   return (
     <div className="flex">
-      <div className="min-h-[calc(100vh-56px)] w-64 border-r-2 bg-white">
+      <div className="min-h-[calc(100vh-56px)] w-64 min-w-64 border-r-2 bg-white">
         {tabs.map((tab: any) => (
           <div key={tab.name} className="flex h-12 items-center px-4">
             <div
@@ -51,12 +51,12 @@ const ProjectLayout = (props: {
                 <div className="absolute left-4 h-6 w-1 rounded-r-lg bg-blue-500" />
               ) : null}
               <Icon name={tab.icon} />
-              <span>{t(tab.name)}</span>
+              <span className="text-nowrap">{t(tab.name)}</span>
             </div>
           </div>
         ))}
       </div>
-      <div className="overflow-hidden">{props.children}</div>
+      <div className="overflow-hidden p-4">{props.children}</div>
     </div>
   );
 };
