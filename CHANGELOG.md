@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/TungNguyen0510/taskify/compare/v1.0.0...v1.1.0) (2024-08-11)
+
+
+### Features
+
+* temp code ([674f47d](https://github.com/TungNguyen0510/taskify/commit/674f47dce4e40bd2bd02b12f3d6140386bfed878))
+
 # 1.0.0 (2024-08-05)
 
 
