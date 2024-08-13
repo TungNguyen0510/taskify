@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/TungNguyen0510/taskify/compare/v1.1.0...v1.2.0) (2024-08-13)
+
+
+### Features
+
+* remove clerk ([0959518](https://github.com/TungNguyen0510/taskify/commit/095951889de2def5ad48ddf597407249224288bc))
+
 # [1.1.0](https://github.com/TungNguyen0510/taskify/compare/v1.0.0...v1.1.0) (2024-08-11)
 
 
