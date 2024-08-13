@@ -1,6 +1,26 @@
-import { auth } from '@clerk/nextjs/server';
+import { getTranslations } from 'next-intl/server';
 
-export default function ListPage() {
-  const { userId } = auth();
-  return <div>{userId}</div>;
+import ListTasks from '@/components/List/ListTasks';
+
+export async function generateMetadata(props: { params: { locale: string } }) {
+  const t = await getTranslations({
+    locale: props.params.locale,
+    namespace: 'List',
+  });
+
+  return {
+    title: t('meta_title'),
+  };
+}
+
+export default function ListPage({
+  params,
+}: {
+  params: { projectId: string };
+}) {
+  return (
+    <div>
+      <ListTasks params={params} />
+    </div>
+  );
 }

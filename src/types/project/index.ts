@@ -1,11 +1,6 @@
 export type User = {
   id: number;
   Project_id: string;
-  User_id: {
-    id: string;
-    clerk_user_id: string;
-    user_id: string;
-  };
 };
 
 export type Project = {
@@ -16,10 +11,4 @@ export type Project = {
   date_created: string;
   user_updated: string;
   date_updated: string;
-  users: User[];
-  owner: {
-    id: string;
-    clerk_user_id: string;
-    user_id: string;
-  };
 };

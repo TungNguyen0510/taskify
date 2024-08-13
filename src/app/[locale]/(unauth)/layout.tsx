@@ -38,7 +38,7 @@ export default function Layout(props: { children: React.ReactNode }) {
       }
       rightNav={
         <>
-          <Link href="/sign-in/">
+          <Link href="/login/">
             <Button
               variant="light"
               className="font-semibold text-black hover:text-blue-500"

@@ -17,19 +17,20 @@ export type NewColumn = {
 
 export type Task = {
   id: string;
-  name: string;
-  sort: string | null;
-  user_created: string;
+  summary: string;
+  description: string;
+  user_created: string | null;
   date_created: string;
-  user_updated: string;
-  date_updated: string;
+  user_updated: string | null;
+  date_updated: string | null;
   pos: number;
   column_id: string;
+  project_id: string;
 };
 
 export type NewTask = {
   project_id: string;
   column_id: string;
-  name: string;
+  summary: string;
   pos: number;
 };

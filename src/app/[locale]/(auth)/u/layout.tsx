@@ -1,14 +1,15 @@
-import { SignedIn, UserButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 
 import LocaleSwitcher from '@/components/LocaleSwitcher';
+import UserArea from '@/components/UserArea';
 import { MainLayout } from '@/templates/MainLayout';
 import { AppConfig } from '@/utils/AppConfig';
 
 export default function AppLayout(props: { children: React.ReactNode }) {
   const t = useTranslations('YourWork');
+
   return (
     <MainLayout
       leftNav={
@@ -38,9 +39,7 @@ export default function AppLayout(props: { children: React.ReactNode }) {
       rightNav={
         <>
           <LocaleSwitcher />
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+          <UserArea />
         </>
       }
     >

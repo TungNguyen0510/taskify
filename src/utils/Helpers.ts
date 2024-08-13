@@ -29,3 +29,7 @@ export const resetAllStores = () => {
   useProjectsStore.getState().reset();
   useTasksStore.getState().reset();
 };
+
+export const handleError = (error: string) => {
+  throw new Error(error);
+};

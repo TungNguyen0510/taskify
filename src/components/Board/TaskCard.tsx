@@ -31,33 +31,20 @@ const TaskCard = (props: TaskCardProps) => {
     transform: CSS.Transform.toString(transform),
   };
 
-  if (isDragging) {
-    return (
-      <Card
-        ref={setNodeRef}
-        style={style}
-        // {...listeners}
-        // {...attributes}
-        radius="sm"
-        shadow="sm"
-        className="min-h-20 rounded-sm border border-blue-500 opacity-80"
-      />
-    );
-  }
-
   return (
     <Card
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      radius="sm"
       shadow="sm"
-      className="h-fit min-h-20 rounded-sm hover:bg-blue-100"
+      className={`h-fit min-h-20 rounded-md ${
+        isDragging ? 'border border-blue-500 opacity-30' : ''
+      }`}
     >
       <CardHeader>
-        <p className="text-pretty break-all text-small hover:underline">
-          {task.name}
+        <p className="select-none text-pretty break-all text-small hover:underline">
+          {task.summary}
         </p>
       </CardHeader>
     </Card>

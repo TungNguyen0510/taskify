@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth } from '@clerk/nextjs';
 import { Divider } from '@nextui-org/react';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
@@ -13,8 +13,11 @@ import ProjectCard from './ProjectCard';
 function YourWorkPage() {
   const t = useTranslations('YourWork');
 
+  const session = useSession();
+
+  const userId = session.data?.user.id;
+
   const { projects, fetchListProjects } = useProjectsStore();
-  const { userId } = useAuth();
 
   useEffect(() => {
     resetAllStores();

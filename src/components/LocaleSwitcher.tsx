@@ -19,6 +19,7 @@ export default function LocaleSwitcher() {
 
   return (
     <Select
+      aria-label="localeSwitcher"
       color="primary"
       radius="sm"
       size="sm"

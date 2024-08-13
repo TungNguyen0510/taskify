@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL as string;
+const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_API as string;
 
 const axiosInstance = axios.create({
   baseURL: baseUrl,

@@ -1,8 +1,4 @@
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
   Button,
@@ -67,6 +63,9 @@ function ColumnContainer(props: ColumnContainerProps) {
       type: 'Column',
       column,
     },
+    attributes: {
+      roleDescription: `Column: ${column.title}`,
+    },
     disabled: editMode,
   });
 
@@ -75,22 +74,15 @@ function ColumnContainer(props: ColumnContainerProps) {
     transform: CSS.Transform.toString(transform),
   };
 
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="flex h-[400px] max-h-full w-64 min-w-64 flex-col gap-2 rounded-md border-2 border-blue-500 bg-slate-50 opacity-80"
-      />
-    );
-  }
   return (
     <>
       <Card
         ref={setNodeRef}
         style={style}
         shadow="sm"
-        className="flex h-[350px] max-h-[calc(100vh-56px-80px-16px-16px)] w-64 min-w-64 flex-col gap-2 rounded-md bg-slate-50"
+        className={`flex h-[350px] max-h-[calc(100vh-56px-80px-16px-16px)] w-64 min-w-64 flex-col gap-2 rounded-md bg-slate-50 ${
+          isDragging ? 'border border-blue-500 opacity-30' : ''
+        }`}
       >
         <div
           {...attributes}
@@ -106,7 +98,7 @@ function ColumnContainer(props: ColumnContainerProps) {
                 <p
                   onClick={() => setEditMode(true)}
                   aria-hidden="true"
-                  className="max-w-[160px] truncate font-semibold hover:underline"
+                  className="max-w-[160px] select-none truncate font-semibold hover:underline"
                 >
                   {column.title}
                 </p>
@@ -200,11 +192,10 @@ function ColumnContainer(props: ColumnContainerProps) {
           </Dropdown>
         </div>
         <div className="scrollbar-2 flex grow flex-col gap-2 overflow-y-auto overflow-x-hidden p-2">
-          <SortableContext
-            items={tasksIds}
-            strategy={verticalListSortingStrategy}
-          >
-            {tasks?.map((task) => <TaskCard key={task.id} task={task} />)}
+          <SortableContext items={tasksIds}>
+            {tasks.map((task) => (
+              <TaskCard key={task.id} task={task} />
+            ))}
           </SortableContext>
         </div>
 

@@ -1,20 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 
 'use client';
 
 import {
+  closestCorners,
   DndContext,
   type DragEndEvent,
   type DragOverEvent,
   DragOverlay,
   type DragStartEvent,
+  KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import {
-  horizontalListSortingStrategy,
   SortableContext,
+  sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { Button, Input, ScrollShadow, Spinner } from '@nextui-org/react';
 import { useTranslations } from 'next-intl';
@@ -67,13 +72,18 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     setIsLoading(false);
   }, []);
 
-  const sensors = [
+  // DND Handlers
+  const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
+      activationConstraint: { delay: 100, tolerance: 5 },
     }),
-  ];
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 100, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const createNewColumn = async () => {
     setIsCreatingColumn(true);
@@ -138,7 +148,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     }
   };
 
-  const createTask = async (columnId: string, name: string) => {
+  const createTask = async (columnId: string, summary: string) => {
     const currentColumnTasks = tasks
       .filter((task) => task.column_id === columnId)
       .sort((a, b) => a.pos - b.pos);
@@ -148,7 +158,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     const newTask: NewTask = {
       project_id: params.projectId,
       column_id: columnId,
-      name,
+      summary,
       pos: lastPos + 1024,
     };
 
@@ -161,13 +171,14 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   };
 
   const onDragStart = (event: DragStartEvent) => {
-    if (event.active.data.current?.type === 'Column') {
-      setActiveColumn(event.active.data.current.column);
+    const data = event.active.data.current;
+    if (data?.type === 'Column') {
+      setActiveColumn(data.column);
       return;
     }
 
-    if (event.active.data.current?.type === 'Task') {
-      setActiveTask(event.active.data.current.task);
+    if (data?.type === 'Task') {
+      setActiveTask(data.task);
     }
   };
 
@@ -179,16 +190,19 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
     if (!over) return;
 
-    const activeColumnId = active.id;
-    const overColumnId = over.id;
+    const activeId = active.id;
+    const overId = over.id;
 
-    if (activeColumnId === overColumnId) return;
+    const activeData = active.data.current;
 
-    const activeColumnIndex = columns.findIndex(
-      (col) => col.id === activeColumnId,
-    );
+    if (activeId === overId) return;
 
-    const overColumnIndex = columns.findIndex((col) => col.id === overColumnId);
+    const isActiveAColumn = activeData?.type === 'Column';
+    if (!isActiveAColumn) return;
+
+    const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
+
+    const overColumnIndex = columns.findIndex((col) => col.id === overId);
 
     const activePos = columns[activeColumnIndex]?.pos;
     const overPos = columns[overColumnIndex]?.pos;
@@ -196,8 +210,8 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     if (!activePos || !overPos) return;
 
     try {
-      await updatePositionColumn(activeColumnId, overPos);
-      await updatePositionColumn(overColumnId, activePos);
+      await updatePositionColumn(activeId, overPos);
+      await updatePositionColumn(overId, activePos);
 
       await fetchListColumns(params.projectId);
     } catch (e) {
@@ -225,32 +239,34 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
       const overTaskIndex = tasks.findIndex((task) => task.id === overId);
 
-      const isBetweenTwoTasks =
-        overTaskIndex > 0 &&
-        tasks[overTaskIndex - 1]!.pos < tasks[activeTaskIndex]!.pos &&
-        tasks[overTaskIndex]!.pos > tasks[activeTaskIndex]!.pos;
-
-      if (isBetweenTwoTasks) {
-        console.log('activeTask đang kéo vào giữa hai task khác');
-      }
-
       try {
         if (
-          tasks[activeTaskIndex]!.column_id === tasks[overTaskIndex]!.column_id
+          tasks[activeTaskIndex] &&
+          tasks[overTaskIndex] &&
+          tasks[activeTaskIndex]!.column_id !== tasks[overTaskIndex]!.column_id
         ) {
           await updatePositionTask(
             activeId,
-            tasks[activeTaskIndex]!.column_id,
-            tasks[overTaskIndex]!.pos,
-          );
-          await updatePositionTask(
-            overId,
             tasks[overTaskIndex]!.column_id,
-            tasks[activeTaskIndex]!.pos,
+            tasks[overTaskIndex]!.pos,
           );
 
           await fetchListTasks(params.projectId);
+          return;
         }
+
+        await updatePositionTask(
+          activeId,
+          tasks[activeTaskIndex]!.column_id,
+          tasks[overTaskIndex]!.pos,
+        );
+        await updatePositionTask(
+          overId,
+          tasks[overTaskIndex]!.column_id,
+          tasks[activeTaskIndex]!.pos,
+        );
+
+        await fetchListTasks(params.projectId);
       } catch (e) {
         console.log(e);
       }
@@ -261,33 +277,16 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     if (isActiveATask && isOverAColumn) {
       const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
 
-      console.log('activeTaskIndex: ', activeTaskIndex);
-      console.log('overTaskId: ', overId);
+      try {
+        if (tasks[activeTaskIndex]) {
+          // caculate new pos
 
-      // try {
-      //   if (tasks[activeTaskIndex]!.column_id !== overId) {
-      //     await updatePositionTask(activeId, overId);
-      //     // await updatePositionTask(
-      //     //   overTaskId,
-      //     //   tasks[overTaskIndex]!.column_id,
-      //     //   tasks[activeTaskIndex]!.pos,
-      //     // );
-
-      //     await fetchListTasks(params.projectId);
-      //   }
-      // } catch (e) {
-      //   console.log(e);
-      // }
-
-      // setTasks((_tasks) => {
-      //   const activeTaskIndex = _tasks.findIndex(
-      //     (col) => col.id === activeTaskId,
-      //   );
-
-      //   _tasks[activeTaskIndex]!.columnId = overTaskId;
-
-      //   return arrayMove(_tasks, activeTaskIndex, activeTaskIndex);
-      // });
+          await updatePositionTask(activeId, overId);
+          await fetchListTasks(params.projectId);
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -302,7 +301,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           <div className="h-20 px-6">
             {currentProject && (
               <div className="text-xl font-semibold">
-                {currentProject?.key} Board
+                {currentProject?.title} Board
               </div>
             )}
           </div>
@@ -312,15 +311,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           >
             <DndContext
               sensors={sensors}
+              collisionDetection={closestCorners}
               onDragStart={onDragStart}
               onDragEnd={onDragEnd}
               onDragOver={onDragOver}
             >
               <div className="flex gap-4">
-                <SortableContext
-                  items={columnsId}
-                  strategy={horizontalListSortingStrategy}
-                >
+                <SortableContext items={columnsId}>
                   {columns
                     .sort((a, b) => a.pos - b.pos)
                     .map((col) => (
@@ -398,7 +395,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                   </Button>
                 )}
 
-                <DragOverlay>
+                <DragOverlay adjustScale={false}>
                   {activeColumn && (
                     <ColumnContainer
                       column={activeColumn}

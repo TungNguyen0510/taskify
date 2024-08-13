@@ -46,7 +46,7 @@ export const useTasksStore = create<State & Actions>()(
           pos?: number,
         ) => {
           await api.patch(`/items/Task/${taskId}`, {
-            columnId,
+            column_id: columnId,
             pos,
           });
         },

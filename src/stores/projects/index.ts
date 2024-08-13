@@ -28,12 +28,9 @@ export const useProjectsStore = create<State & Actions>()(
         fetchListProjects: async (userId: string) => {
           const response = await api.get<any>('/items/Project', {
             params: {
-              fields: '*,owner.*,users.*,users.User_id.*',
               filter: {
-                owner: {
-                  clerk_user_id: {
-                    _eq: userId,
-                  },
+                user_created: {
+                  _eq: userId,
                 },
               },
             },

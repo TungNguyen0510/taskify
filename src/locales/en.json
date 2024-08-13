@@ -2,8 +2,6 @@
   "RootLayout": {
     "home_link": "Home",
     "about_link": "About",
-    "guestbook_link": "Guestbook",
-    "portfolio_link": "Portfolio",
     "sign_in_link": "Log in",
     "sign_up_link": "Sign up"
   },
@@ -14,6 +12,9 @@
     "Board": "Board",
     "List": "List",
     "Backlog": "Backlog"
+  },
+  "AuthFormLayout": {
+    "taskify_description": "The only project management tool you need to plan and track work across every team."
   },
   "Index": {
     "meta_title": "Taskify",
@@ -28,7 +29,7 @@
     "meta_description": "Description of the Taskify application",
     "about_paragraph": "Welcome to our About page! We are a team of passionate individuals dedicated to creating amazing software."
   },
-  "SignIn": {
+  "Login": {
     "meta_title": "Sign in - Taskify",
     "meta_description": "Seamlessly sign in to your account with our user-friendly login process."
   },
@@ -54,6 +55,12 @@
   "Board": {
     "meta_title": "Board"
   },
+  "List": {
+    "meta_title": "List"
+  },
+  "Backlog": {
+    "meta_title": "Backlog"
+  },
   "KanbanBoard": {
     "add_column": "Add column",
     "col_title_empty": "Column title cannot be empty"
@@ -68,5 +75,20 @@
   },
   "ConfirmModal": {
     "cancel": "Cancel"
+  },
+  "LoginForm": {
+    "title": "Login",
+    "buttonText": "Login",
+    "linkText": "Create an account",
+    "linkDescription": "New here? "
+  },
+  "SignUpForm": {
+    "title": "Sign Up",
+    "buttonText": "Register",
+    "linkText": "Login",
+    "linkDescription": "Already have an account? "
+  },
+  "AuthForm": {
+    "forgotPassword": "Forgot password?"
   }
 }
