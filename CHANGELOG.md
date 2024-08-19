@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/TungNguyen0510/taskify/compare/v1.2.0...v1.3.0) (2024-08-19)
+
+
+### Features
+
+* remove nextintl ([3221c95](https://github.com/TungNguyen0510/taskify/commit/3221c957acb3b386c5a24c1ad139f435a857fc29))
+
 # [1.2.0](https://github.com/TungNguyen0510/taskify/compare/v1.1.0...v1.2.0) (2024-08-13)
 
 
