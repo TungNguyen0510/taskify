@@ -16,17 +16,23 @@ function ProjectCard(props: ProjectCardProps) {
 
   return (
     <Card
-      className="flex min-h-52 min-w-64 flex-row overflow-hidden rounded-md"
+      isHoverable
+      className="flex min-h-52 min-w-64 max-w-64 flex-row overflow-hidden rounded-md"
       radius="sm"
     >
       <div className="h-full w-6 bg-blue-100" />
       <div className="h-full">
         <div
-          className="p-2 font-semibold hover:underline"
+          className="flex w-full cursor-pointer flex-col p-2"
           onClick={() => goToProject(props.project.id)}
           aria-hidden="true"
         >
-          {props.project.title}
+          <div className="select-none font-semibold hover:underline">
+            {props.project.name}
+          </div>
+          <div className="line-clamp-2 max-w-full text-ellipsis text-xs text-gray-500">
+            {props.project.description}
+          </div>
         </div>
       </div>
     </Card>

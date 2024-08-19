@@ -3,8 +3,6 @@ const MainLayout = (props: {
   rightNav?: React.ReactNode;
   children: React.ReactNode;
 }) => {
-  // const t = useTranslations('MainLayout');
-
   return (
     <div className="w-full text-black antialiased">
       <div>

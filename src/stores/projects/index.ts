@@ -6,18 +6,30 @@ import api from '@/utils/axiosInstance';
 
 type State = {
   projects: Project[];
-  currentProject: Project | null;
+  currentProject: Project;
 };
 
 type Actions = {
   fetchListProjects: (userId: string) => void;
   fetchCurrentProject: (projectId: string) => void;
+  updateCurrentProject: (projectId: string, data: any) => void;
+  createNewProject: (newProject: any) => void;
   reset: () => void;
 };
 
 const initialState: State = {
   projects: [],
-  currentProject: null,
+  currentProject: {
+    id: '',
+    name: '',
+    key: '',
+    description: '',
+    user_created: '',
+    date_created: '',
+    user_updated: '',
+    date_updated: '',
+    tasks_count: 0,
+  },
 };
 
 export const useProjectsStore = create<State & Actions>()(
@@ -29,10 +41,11 @@ export const useProjectsStore = create<State & Actions>()(
           const response = await api.get<any>('/items/Project', {
             params: {
               filter: {
-                user_created: {
+                owner: {
                   _eq: userId,
                 },
               },
+              sort: ['date_created'],
             },
           });
 
@@ -42,10 +55,36 @@ export const useProjectsStore = create<State & Actions>()(
         fetchCurrentProject: async (projectId: string) => {
           const response = await api.get<any>(`/items/Project/${projectId}`, {
             params: {
-              fields: '*,owner.*,users.*,users.User_id.*',
+              fields: '*',
             },
           });
           set({ currentProject: response.data.data });
+        },
+
+        updateCurrentProject: async (projectId: string, data: any) => {
+          await api.patch<any>(`/items/Project/${projectId}`, data);
+        },
+
+        createNewProject: async (newProject: any) => {
+          const response = await api.post<any>('/items/Project', newProject);
+          await api.post<any>('/items/Column', [
+            {
+              status: 'To Do',
+              project_id: response.data.data.id,
+              pos: 1,
+            },
+            {
+              status: 'In Progress',
+              project_id: response.data.data.id,
+              pos: 2,
+            },
+            {
+              status: 'Done',
+              project_id: response.data.data.id,
+              isDone: true,
+              pos: 3,
+            },
+          ]);
         },
 
         reset: () => {
@@ -54,7 +93,7 @@ export const useProjectsStore = create<State & Actions>()(
       }),
       {
         name: 'projects-storage',
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => sessionStorage),
       },
     ),
   ),

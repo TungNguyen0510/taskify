@@ -10,12 +10,11 @@ import {
   Input,
   Spinner,
 } from '@nextui-org/react';
-import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import TaskCard from '@/components/Board/TaskCard';
-import ConfirmModal from '@/components/ConfirmModal';
 import Icon from '@/components/Icon';
+import ConfirmModal from '@/components/Modal/ConfirmModal';
 import useClickOutside from '@/hooks/useClickOutside';
 import type { Column, Task } from '@/types/board';
 
@@ -23,28 +22,34 @@ interface ColumnContainerProps {
   column: Column;
   tasks: Task[];
   deleteColumn: (id: string) => void;
-  updateTitleColumn(id: string, title: string): void;
-  createTask: (columnId: string, title: string) => void;
+  updateStatusColumn(id: string, status: string): void;
+  createTask: (columnId: string, status: string) => void;
+  deleteTask: (taskId: string) => void;
 }
 
 function ColumnContainer(props: ColumnContainerProps) {
-  const t = useTranslations('ColumnContainer');
-
-  const { column, tasks, deleteColumn, updateTitleColumn, createTask } = props;
+  const {
+    column,
+    tasks,
+    deleteColumn,
+    updateStatusColumn,
+    createTask,
+    deleteTask,
+  } = props;
 
   const [editMode, setEditMode] = useState(false);
   const [isConfirmDeleteColumn, setIsConfirmDeleteColumn] =
     useState<boolean>(false);
 
-  const [newTitleColumn, setNewTitleColumn] = useState(column.title);
+  const [newStatusColumn, setNewStatusColumn] = useState(column.status);
 
   const [isCreatingTask, setIsCreatingTask] = useState(false);
-  const [createTaskTitle, setCreateTaskTitle] = useState('');
+  const [createTaskSummary, setCreateTaskSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const creatingTaskRef = useClickOutside(() => setIsCreatingTask(false));
 
-  const editColumnTitleRef = useClickOutside(() => setEditMode(false));
+  const editColumnStatusRef = useClickOutside(() => setEditMode(false));
 
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
@@ -64,7 +69,7 @@ function ColumnContainer(props: ColumnContainerProps) {
       column,
     },
     attributes: {
-      roleDescription: `Column: ${column.title}`,
+      roleDescription: `Column: ${column.status}`,
     },
     disabled: editMode,
   });
@@ -80,7 +85,7 @@ function ColumnContainer(props: ColumnContainerProps) {
         ref={setNodeRef}
         style={style}
         shadow="sm"
-        className={`flex h-[350px] max-h-[calc(100vh-56px-80px-16px-16px)] w-64 min-w-64 flex-col gap-2 rounded-md bg-slate-50 ${
+        className={`flex h-[450px] max-h-[calc(100vh-56px-80px-16px-16px)] w-[270px] min-w-[270px] flex-col gap-2 rounded-md bg-slate-50 ${
           isDragging ? 'border border-blue-500 opacity-30' : ''
         }`}
       >
@@ -98,10 +103,15 @@ function ColumnContainer(props: ColumnContainerProps) {
                 <p
                   onClick={() => setEditMode(true)}
                   aria-hidden="true"
-                  className="max-w-[160px] select-none truncate font-semibold hover:underline"
+                  className="max-w-[140px] select-none truncate font-semibold hover:underline"
                 >
-                  {column.title}
+                  {column.status}
                 </p>
+                {column.isDone ? (
+                  <div className="text-green-500">
+                    <Icon name="checked" />
+                  </div>
+                ) : null}
 
                 <div>{isLoading && <Spinner size="sm" />}</div>
               </div>
@@ -109,7 +119,7 @@ function ColumnContainer(props: ColumnContainerProps) {
             {editMode && (
               <div
                 className="absolute left-8 top-0 z-10 flex min-w-[160px] flex-col gap-1"
-                ref={editColumnTitleRef as React.RefObject<HTMLDivElement>}
+                ref={editColumnStatusRef as React.RefObject<HTMLDivElement>}
               >
                 <Input
                   autoFocus
@@ -118,16 +128,16 @@ function ColumnContainer(props: ColumnContainerProps) {
                   variant="bordered"
                   radius="sm"
                   className="min-w-[160px]"
-                  value={newTitleColumn}
+                  value={newStatusColumn}
                   maxLength={30}
-                  onChange={(e) => setNewTitleColumn(e.target.value)}
+                  onChange={(e) => setNewStatusColumn(e.target.value)}
                   onKeyDown={(event) => {
                     if (event.key !== 'Enter') return;
-                    updateTitleColumn(column.id, newTitleColumn);
+                    updateStatusColumn(column.id, newStatusColumn);
                     setEditMode(false);
                   }}
                 >
-                  {newTitleColumn}
+                  {newStatusColumn}
                 </Input>
                 <div className="flex w-full justify-end gap-2">
                   <Button
@@ -137,7 +147,7 @@ function ColumnContainer(props: ColumnContainerProps) {
                     aria-label="more"
                     className="h-8"
                     onClick={() => {
-                      setNewTitleColumn(column.title);
+                      setNewStatusColumn(column.status);
                       setEditMode(false);
                     }}
                   >
@@ -149,15 +159,15 @@ function ColumnContainer(props: ColumnContainerProps) {
                     variant="shadow"
                     aria-label="more"
                     className="h-8"
-                    isDisabled={!newTitleColumn}
+                    isDisabled={!newStatusColumn}
                     onClick={() => {
                       setEditMode(false);
 
-                      if (!newTitleColumn || newTitleColumn === column.title)
+                      if (!newStatusColumn || newStatusColumn === column.status)
                         return;
 
                       setIsLoading(true);
-                      updateTitleColumn(column.id, newTitleColumn);
+                      updateStatusColumn(column.id, newStatusColumn);
                       setIsLoading(false);
                     }}
                   >
@@ -168,7 +178,7 @@ function ColumnContainer(props: ColumnContainerProps) {
             )}
           </div>
 
-          <Dropdown>
+          <Dropdown placement="bottom-start">
             <DropdownTrigger>
               <Button
                 isIconOnly
@@ -186,7 +196,7 @@ function ColumnContainer(props: ColumnContainerProps) {
                 className="font-semibold text-danger"
                 color="danger"
               >
-                {t('delete')}
+                Delete
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -194,7 +204,7 @@ function ColumnContainer(props: ColumnContainerProps) {
         <div className="scrollbar-2 flex grow flex-col gap-2 overflow-y-auto overflow-x-hidden p-2">
           <SortableContext items={tasksIds}>
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} deleteTask={deleteTask} />
             ))}
           </SortableContext>
         </div>
@@ -210,15 +220,15 @@ function ColumnContainer(props: ColumnContainerProps) {
               size="lg"
               variant="flat"
               radius="sm"
-              placeholder={t('create_task_placeholder')}
-              value={createTaskTitle}
+              placeholder="What needs to be done?"
+              value={createTaskSummary}
               maxLength={255}
               className="w-full rounded-md"
-              onChange={(e) => setCreateTaskTitle(e.target.value)}
+              onChange={(e) => setCreateTaskSummary(e.target.value)}
               onKeyDown={(event) => {
                 if (event.key !== 'Enter') return;
-                createTask(column.id, createTaskTitle);
-                setCreateTaskTitle('');
+                createTask(column.id, createTaskSummary);
+                setCreateTaskSummary('');
                 setIsCreatingTask(false);
               }}
             />
@@ -228,15 +238,15 @@ function ColumnContainer(props: ColumnContainerProps) {
                 variant="shadow"
                 size="sm"
                 aria-label="more"
-                isDisabled={!createTaskTitle}
+                isDisabled={!createTaskSummary}
                 onClick={() => {
-                  if (!createTaskTitle) return;
-                  createTask(column.id, createTaskTitle);
-                  setCreateTaskTitle('');
+                  if (!createTaskSummary) return;
+                  createTask(column.id, createTaskSummary);
+                  setCreateTaskSummary('');
                   setIsCreatingTask(false);
                 }}
               >
-                {t('create')}
+                Create
               </Button>
             </div>
           </div>
@@ -250,7 +260,7 @@ function ColumnContainer(props: ColumnContainerProps) {
               startContent={<Icon name="plus" />}
               onClick={() => setIsCreatingTask(true)}
             >
-              {t('add_task')}
+              Add task
             </Button>
           </div>
         )}
@@ -259,9 +269,9 @@ function ColumnContainer(props: ColumnContainerProps) {
       <ConfirmModal
         backdrop="opaque"
         modalPlacement="top-center"
-        comfirmTitle={t('delete_column_title')}
-        comfirmMessage={t('delete_column_message')}
-        okTitle={t('delete')}
+        comfirmTitle="Confirm delete column"
+        comfirmMessage="Are you sure you want to delete this column?"
+        okTitle="Delete"
         isOpen={isConfirmDeleteColumn}
         onClose={() => setIsConfirmDeleteColumn(false)}
         onConfirm={() => {

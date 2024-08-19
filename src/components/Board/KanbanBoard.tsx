@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
 
 'use client';
@@ -22,7 +21,8 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { Button, Input, ScrollShadow, Spinner } from '@nextui-org/react';
-import { useTranslations } from 'next-intl';
+import { notFound } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import ColumnContainer from '@/components/Board/ColumnContainer';
@@ -35,19 +35,25 @@ import type { Column, NewColumn, NewTask, Task } from '@/types/board';
 import { resetAllStores } from '@/utils/Helpers';
 
 function KanbanBoard({ params }: { params: { projectId: string } }) {
-  const t = useTranslations('KanbanBoard');
-
+  const session = useSession();
+  const userId = session?.data?.user.id;
   const {
     columns,
     fetchListColumns,
     createColumn,
-    updateTitleColumn,
+    updateStatusColumn,
     updatePositionColumn,
     deleteColumn,
   } = useColumnsStore();
-  const { tasks, fetchListTasks, createNewTask, updatePositionTask } =
-    useTasksStore();
-  const { currentProject, fetchCurrentProject } = useProjectsStore();
+  const {
+    tasks,
+    fetchListTasks,
+    createNewTask,
+    updatePositionTask,
+    deleteTask,
+  } = useTasksStore();
+  const { currentProject, fetchCurrentProject, updateCurrentProject } =
+    useProjectsStore();
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -56,7 +62,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  const [createColumnTitle, setCreateColumnTitle] = useState<string>('');
+  const [createColumnStatus, setCreateColumnStatus] = useState<string>('');
   const [isCreatingColumn, setIsCreatingColumn] = useState<boolean>(false);
 
   const fetchData = (projectId: string) => {
@@ -92,7 +98,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       columns.sort((a, b) => a.pos - b.pos)[columns.length - 1]?.pos ?? 0;
 
     const columnToAdd: NewColumn = {
-      title: createColumnTitle,
+      status: createColumnStatus,
       pos: lastPos + 1,
       project_id: params.projectId,
     };
@@ -101,14 +107,14 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       setIsLoading(true);
       await createColumn(columnToAdd);
 
-      setCreateColumnTitle('');
+      setCreateColumnStatus('');
 
       await fetchListColumns(params.projectId);
 
       setIsLoading(false);
     } catch (e) {
-      console.log(e);
       setIsLoading(false);
+      throw new Error('Failed to create new column');
     }
   };
 
@@ -126,47 +132,69 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
       setIsLoading(false);
     } catch (e) {
-      console.log(e);
       setIsLoading(false);
+      throw new Error('Failed to delete column');
     }
 
     // need tranfer tasks to other column
   };
 
-  const updateCurrentTitleColumn = async (columnId: string, title: string) => {
-    if (title === '') return;
+  const updateCurrentStatusColumn = async (
+    columnId: string,
+    status: string,
+  ) => {
+    if (status === '') return;
     try {
       setIsLoading(true);
 
-      await updateTitleColumn(columnId, title);
+      await updateStatusColumn(columnId, status);
       await fetchListColumns(params.projectId);
 
       setIsLoading(false);
     } catch (e) {
-      console.log(e);
       setIsLoading(false);
+      throw new Error('Failed to update status column');
     }
   };
 
   const createTask = async (columnId: string, summary: string) => {
+    if (!userId) return;
+
     const currentColumnTasks = tasks
       .filter((task) => task.column_id === columnId)
       .sort((a, b) => a.pos - b.pos);
 
+    const projectKey = currentProject?.key;
+
     const lastPos = currentColumnTasks[currentColumnTasks.length - 1]?.pos ?? 0;
 
     const newTask: NewTask = {
+      reporter: userId,
       project_id: params.projectId,
       column_id: columnId,
       summary,
+      key: `${projectKey}-${currentProject.tasks_count + 1}`,
       pos: lastPos + 1024,
     };
 
     try {
       await createNewTask(newTask);
+      await updateCurrentProject(params.projectId, {
+        tasks_count: currentProject.tasks_count + 1,
+      });
+      await fetchCurrentProject(params.projectId);
       await fetchListTasks(params.projectId);
     } catch (e) {
-      console.log(e);
+      throw new Error('Failed to create new task');
+    }
+  };
+
+  const deleteCurrentTask = async (taskId: string) => {
+    try {
+      await deleteTask(taskId);
+      await fetchListTasks(params.projectId);
+    } catch (error) {
+      throw new Error('Failed to delete task');
     }
   };
 
@@ -215,7 +243,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
       await fetchListColumns(params.projectId);
     } catch (e) {
-      console.log(e);
+      throw new Error('Failed to update position column');
     }
   };
 
@@ -235,40 +263,70 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     if (!isActiveATask) return;
 
     if (isActiveATask && isOverATask) {
-      const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
+      // Filter tasks for columnId before find index
 
-      const overTaskIndex = tasks.findIndex((task) => task.id === overId);
+      const columnIdHasActiveTask = tasks.find(
+        (task) => task.id === activeId,
+      )?.column_id;
+
+      const columnIdHasOverTask = tasks.find(
+        (task) => task.id === overId,
+      )?.column_id;
+
+      const listTaskOfActiveTask = tasks.filter(
+        (task) => task.column_id === columnIdHasActiveTask,
+      );
+
+      const listTaskOfOverTask = tasks.filter(
+        (task) => task.column_id === columnIdHasOverTask,
+      );
+
+      console.log('listTaskOfActiveTask', listTaskOfActiveTask);
+      console.log('listTaskOfOverTask', listTaskOfOverTask);
+
+      const activeTaskIndex = listTaskOfActiveTask.findIndex(
+        (task) => task.id === activeId,
+      );
+
+      const overTaskIndex = listTaskOfOverTask.findIndex(
+        (task) => task.id === overId,
+      );
+
+      console.log('activeId', activeId);
+      console.log('overId', overId);
+      console.log('activeTaskIndex', activeTaskIndex);
+      console.log('overTaskIndex', overTaskIndex);
 
       try {
-        if (
-          tasks[activeTaskIndex] &&
-          tasks[overTaskIndex] &&
-          tasks[activeTaskIndex]!.column_id !== tasks[overTaskIndex]!.column_id
-        ) {
+        if (columnIdHasActiveTask === columnIdHasOverTask) {
           await updatePositionTask(
             activeId,
-            tasks[overTaskIndex]!.column_id,
-            tasks[overTaskIndex]!.pos,
+            listTaskOfActiveTask[activeTaskIndex]!.column_id,
+            listTaskOfActiveTask[overTaskIndex]!.pos,
+          );
+          await updatePositionTask(
+            overId,
+            listTaskOfActiveTask[overTaskIndex]!.column_id,
+            listTaskOfActiveTask[activeTaskIndex]!.pos,
           );
 
           await fetchListTasks(params.projectId);
-          return;
         }
 
-        await updatePositionTask(
-          activeId,
-          tasks[activeTaskIndex]!.column_id,
-          tasks[overTaskIndex]!.pos,
-        );
-        await updatePositionTask(
-          overId,
-          tasks[overTaskIndex]!.column_id,
-          tasks[activeTaskIndex]!.pos,
-        );
+        // await updatePositionTask(
+        //   activeId,
+        //   listTaskOfActiveTask[activeTaskIndex]!.column_id,
+        //   listTaskOfActiveTask[overTaskIndex]!.pos,
+        // );
+        // await updatePositionTask(
+        //   overId,
+        //   listTaskOfActiveTask[overTaskIndex]!.column_id,
+        //   listTaskOfActiveTask[activeTaskIndex]!.pos,
+        // );
 
-        await fetchListTasks(params.projectId);
+        // await fetchListTasks(params.projectId);
       } catch (e) {
-        console.log(e);
+        throw new Error('Failed to update position task');
       }
     }
 
@@ -285,10 +343,14 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           await fetchListTasks(params.projectId);
         }
       } catch (e) {
-        console.log(e);
+        throw new Error('Failed to update position task');
       }
     }
   };
+
+  if (!userId) {
+    return notFound();
+  }
 
   return (
     <div>
@@ -301,13 +363,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           <div className="h-20 px-6">
             {currentProject && (
               <div className="text-xl font-semibold">
-                {currentProject?.title} Board
+                {currentProject?.name} Board
               </div>
             )}
           </div>
           <ScrollShadow
             orientation="horizontal"
-            className="scrollbar-1 flex min-h-[calc(100vh-56px-80px-16px)] w-full gap-4 px-4 py-2"
+            className="scrollbar-1 flex min-h-[calc(100vh-56px-80px-16px)] w-full gap-4 overflow-y-hidden px-4 py-2"
           >
             <DndContext
               sensors={sensors}
@@ -328,8 +390,9 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                           .filter((task) => task.column_id === col.id)
                           .sort((a, b) => a.pos - b.pos)}
                         deleteColumn={deleteCurrentColumn}
-                        updateTitleColumn={updateCurrentTitleColumn}
+                        updateStatusColumn={updateCurrentStatusColumn}
                         createTask={createTask}
+                        deleteTask={deleteCurrentTask}
                       />
                     ))}
                 </SortableContext>
@@ -342,10 +405,10 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                       size="lg"
                       variant="bordered"
                       radius="sm"
-                      value={createColumnTitle}
+                      value={createColumnStatus}
                       maxLength={30}
                       className="min-w-64"
-                      onChange={(e) => setCreateColumnTitle(e.target.value)}
+                      onChange={(e) => setCreateColumnStatus(e.target.value)}
                       onKeyDown={(event) => {
                         if (event.key !== 'Enter') return;
                         createNewColumn();
@@ -360,7 +423,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                         aria-label="more"
                         className="h-8"
                         onClick={() => {
-                          setCreateColumnTitle('');
+                          setCreateColumnStatus('');
                           setIsCreatingColumn(false);
                         }}
                       >
@@ -372,7 +435,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                         variant="shadow"
                         aria-label="more"
                         className="h-8"
-                        isDisabled={!createColumnTitle}
+                        isDisabled={!createColumnStatus}
                         onClick={() => {
                           createNewColumn();
                           setIsCreatingColumn(false);
@@ -391,7 +454,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                     startContent={<Icon name="plus" />}
                     onClick={() => setIsCreatingColumn(true)}
                   >
-                    {t('add_column')}
+                    Add column
                   </Button>
                 )}
 
@@ -403,12 +466,18 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                         .filter((task) => task.column_id === activeColumn.id)
                         .sort((a, b) => a.pos - b.pos)}
                       deleteColumn={deleteCurrentColumn}
-                      updateTitleColumn={updateCurrentTitleColumn}
+                      updateStatusColumn={updateCurrentStatusColumn}
                       createTask={createTask}
+                      deleteTask={deleteCurrentTask}
                     />
                   )}
 
-                  {activeTask && <TaskCard task={activeTask} />}
+                  {activeTask && (
+                    <TaskCard
+                      task={activeTask}
+                      deleteTask={deleteCurrentTask}
+                    />
+                  )}
                 </DragOverlay>
               </div>
             </DndContext>

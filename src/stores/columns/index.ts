@@ -11,7 +11,7 @@ type State = {
 type Actions = {
   fetchListColumns: (projectId: string) => void;
   createColumn: (column: NewColumn) => void;
-  updateTitleColumn: (columnId: string, title: string) => void;
+  updateStatusColumn: (columnId: string, status: string) => void;
   updatePositionColumn: (columnId: any, pos: number) => void;
   deleteColumn: (columnId: string) => void;
   reset: () => void;
@@ -43,9 +43,9 @@ export const useColumnsStore = create<State & Actions>()(
           await api.post('/items/Column', newColumn);
         },
 
-        updateTitleColumn: async (columnId: string, title: string) => {
+        updateStatusColumn: async (columnId: string, status: string) => {
           await api.patch(`/items/Column/${columnId}`, {
-            title,
+            status,
           });
         },
 
@@ -65,7 +65,7 @@ export const useColumnsStore = create<State & Actions>()(
       }),
       {
         name: 'columns-storage',
-        storage: createJSONStorage(() => localStorage),
+        storage: createJSONStorage(() => sessionStorage),
       },
     ),
   ),

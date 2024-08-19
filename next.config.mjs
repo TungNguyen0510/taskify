@@ -4,13 +4,10 @@ import { fileURLToPath } from 'node:url';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 import createJiti from 'jiti';
-import withNextIntl from 'next-intl/plugin';
 
 const jiti = createJiti(fileURLToPath(import.meta.url));
 
 jiti('./src/libs/Env');
-
-const withNextIntlConfig = withNextIntl('./src/libs/i18n.ts');
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -18,18 +15,16 @@ const bundleAnalyzer = withBundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 export default withSentryConfig(
-  bundleAnalyzer(
-    withNextIntlConfig({
-      eslint: {
-        dirs: ['.'],
-      },
-      poweredByHeader: false,
-      reactStrictMode: true,
-      experimental: {
-        serverComponentsExternalPackages: ['@electric-sql/pglite'],
-      },
-    }),
-  ),
+  bundleAnalyzer({
+    eslint: {
+      dirs: ['.'],
+    },
+    poweredByHeader: false,
+    reactStrictMode: true,
+    experimental: {
+      serverComponentsExternalPackages: ['@electric-sql/pglite'],
+    },
+  }),
   {
     // For all available options, see:
     // https://github.com/getsentry/sentry-webpack-plugin#options
@@ -37,8 +32,8 @@ export default withSentryConfig(
     // Suppresses source map uploading logs during build
     silent: true,
     // FIXME: Add your Sentry organization and project names
-    org: 'nextjs-boilerplate-org',
-    project: 'nextjs-boilerplate',
+    org: 'tungnn1',
+    project: 'taskify',
   },
   {
     // For all available options, see:

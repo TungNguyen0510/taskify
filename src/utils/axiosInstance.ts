@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 

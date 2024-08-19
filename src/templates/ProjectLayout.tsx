@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 
 import Icon from '@/components/Icon';
 
@@ -27,7 +26,6 @@ const ProjectLayout = (props: {
   children: React.ReactNode;
   params: { projectId: string };
 }) => {
-  const t = useTranslations('ProjectLayout');
   const router = useRouter();
   const pathname = usePathname();
   const pathParts = pathname.split('/');
@@ -51,7 +49,7 @@ const ProjectLayout = (props: {
                 <div className="absolute left-4 h-6 w-1 rounded-r-lg bg-blue-500" />
               ) : null}
               <Icon name={tab.icon} />
-              <span className="text-nowrap">{t(tab.name)}</span>
+              <span className="text-nowrap">{tab.name}</span>
             </div>
           </div>
         ))}

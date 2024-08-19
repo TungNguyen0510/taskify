@@ -44,32 +44,24 @@ export const login = async ({
   }
 };
 
-export const register = async ({
+export const registerUser = async ({
   first_name,
   last_name,
   email,
   password,
+  role,
 }: {
   first_name?: string;
   last_name?: string;
   email: string;
   password: string;
+  role?: string;
 }) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DIRECTUS_API}/users/register`,
-    {
-      method: 'POST',
-      body: JSON.stringify({ first_name, last_name, email, password }),
-      headers: { 'Content-Type': 'application/json' },
-    },
-  );
+  const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_API}/users`, {
+    method: 'POST',
+    body: JSON.stringify({ first_name, last_name, email, password, role }),
+    headers: { 'Content-Type': 'application/json' },
+  });
 
-  console.log(res);
-  // const user = await res.json();
-  // if (!res.ok && user) {
-  //   throw new Error('Email address or password is invalid');
-  // }
-  // if (res.ok && user) {
-  //   return user?.data;
-  // }
+  return res;
 };

@@ -3,14 +3,10 @@
 import { Button } from '@nextui-org/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 
-import LocaleSwitcher from '@/components/LocaleSwitcher';
 import { AppConfig } from '@/utils/AppConfig';
 
 function AuthFormLayout({ children }: { children: React.ReactNode }) {
-  const t = useTranslations('AuthFormLayout');
-
   const route = useRouter();
 
   return (
@@ -39,12 +35,12 @@ function AuthFormLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <p className="text-wrap font-semibold">{t('taskify_description')}</p>
+        <p className="text-wrap font-semibold">
+          The only project management tool you need to plan and track work
+          across every team.
+        </p>
       </div>
       <div className="mx-auto flex min-h-screen w-[450px] flex-col justify-center sm:w-3/5 md:w-1/2">
-        <div className="absolute top-8 flex w-full max-w-[450px] justify-end">
-          <LocaleSwitcher />
-        </div>
         {children}
       </div>
     </div>

@@ -1,52 +1,42 @@
-import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
-import createMiddleware from 'next-intl/middleware';
 
-import { AppConfig } from './utils/AppConfig';
+const publicPages = ['/', '/login', '/sign-up'];
 
-const publicPages = [
-  '/',
-  '/login',
-  '/sign-up',
-  '/request-reset-password',
-  '/reset-password',
-];
+export default withAuth(
+  async function middleware(req) {
+    const token = await getToken({ req });
+    const isAuth = !!token;
+    const currentPath = req.nextUrl.pathname;
 
-const intlMiddleware = createMiddleware({
-  locales: AppConfig.locales,
-  localePrefix: AppConfig.localePrefix,
-  defaultLocale: AppConfig.defaultLocale,
-});
+    const isPublicPage = publicPages.includes(currentPath);
 
-const authMiddleware = withAuth(
-  function onSuccess(req) {
-    return intlMiddleware(req);
+    if (isPublicPage) {
+      if (isAuth && currentPath === '/') {
+        return NextResponse.redirect(new URL('/u/your-work', req.url));
+      }
+      return NextResponse.next();
+    }
+
+    if (!isAuth) {
+      let from = currentPath;
+      if (req.nextUrl.search) {
+        from += req.nextUrl.search;
+      }
+
+      return NextResponse.redirect(
+        new URL(`/?from=${encodeURIComponent(from)}`, req.url),
+      );
+    }
+
+    return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => token != null,
-    },
-    pages: {
-      signIn: '/login',
+      async authorized() {
+        return true;
+      },
     },
   },
 );
-
-export default function middleware(req: NextRequest) {
-  const publicPathnameRegex = RegExp(
-    `^(/(${AppConfig.locales.join('|')}))?(${publicPages
-      .flatMap((p) => (p === '/' ? ['', '/'] : p))
-      .join('|')})/?$`,
-    'i',
-  );
-  const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
-
-  if (isPublicPage) {
-    return intlMiddleware(req);
-  }
-  return (authMiddleware as any)(req);
-}
-
-export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
-};

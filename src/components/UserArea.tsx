@@ -15,7 +15,11 @@ function UserArea() {
 
   const user = session.data?.user;
 
-  const nameIcon = user?.name?.substring(0, 2)?.toUpperCase();
+  const nameIcon = user?.name
+    ?.split(' ')
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase();
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
