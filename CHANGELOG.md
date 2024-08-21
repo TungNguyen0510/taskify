@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/TungNguyen0510/taskify/compare/v1.4.0...v1.5.0) (2024-08-21)
+
+
+### Features
+
+* rewrite & add auth forms ([b7a6320](https://github.com/TungNguyen0510/taskify/commit/b7a6320af388bfc8433a116ffaff7ad80cf793bf))
+
 # [1.4.0](https://github.com/TungNguyen0510/taskify/compare/v1.3.0...v1.4.0) (2024-08-21)
 
 
