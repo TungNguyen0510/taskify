@@ -1,6 +1,7 @@
 import { Avatar, Tooltip } from '@nextui-org/react';
 
 import { useUsersStore } from '@/stores/users';
+import { AppConfig } from '@/utils/AppConfig';
 import { getInitialsName } from '@/utils/Helpers';
 
 interface UserAssigneeProps {
@@ -37,7 +38,7 @@ function UserAssignee(props: UserAssigneeProps) {
                 }
                 showFallback
                 src={
-                  `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser?.avatar?.id}` ??
+                  `${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ??
                   ''
                 }
               />
@@ -62,10 +63,7 @@ function UserAssignee(props: UserAssigneeProps) {
             : ''
         }
         showFallback
-        src={
-          `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser?.avatar?.id}` ??
-          ''
-        }
+        src={`${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''}
       />
     </Tooltip>
   );

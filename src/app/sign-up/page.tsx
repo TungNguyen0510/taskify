@@ -7,6 +7,6 @@ export async function generateMetadata() {
   };
 }
 
-export default function Login() {
+export default function SignUp() {
   return <SignUpPage />;
 }

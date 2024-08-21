@@ -1,6 +1,7 @@
 import { Avatar } from '@nextui-org/react';
 
 import { useUsersStore } from '@/stores/users';
+import { AppConfig } from '@/utils/AppConfig';
 import { getInitialsName } from '@/utils/Helpers';
 
 interface AvatarUserProps {
@@ -20,10 +21,7 @@ function AvatarUser(props: AvatarUserProps) {
         size="sm"
         name={getInitialsName(currentUser?.first_name, currentUser?.last_name)}
         showFallback
-        src={
-          `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser?.avatar?.id}` ??
-          ''
-        }
+        src={`${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''}
       />
 
       <div>

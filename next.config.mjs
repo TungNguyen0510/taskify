@@ -32,8 +32,8 @@ export default withSentryConfig(
     // Suppresses source map uploading logs during build
     silent: true,
     // FIXME: Add your Sentry organization and project names
-    org: 'tungnn1',
-    project: 'taskify',
+    org: 'nextjs-boilerplate-org',
+    project: 'nextjs-boilerplate',
   },
   {
     // For all available options, see:

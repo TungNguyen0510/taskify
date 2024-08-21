@@ -2,7 +2,15 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { withAuth } from 'next-auth/middleware';
 
-const publicPages = ['/', '/login', '/sign-up'];
+const publicPages = [
+  '/',
+  '/login',
+  '/sign-up',
+  '/verify',
+  '/request-reset-password',
+  '/reset-password',
+  '/accept-invite',
+];
 
 export default withAuth(
   async function middleware(req) {
@@ -20,14 +28,6 @@ export default withAuth(
     }
 
     if (!isAuth) {
-      // let from = currentPath;
-      // if (req.nextUrl.search) {
-      //   from += req.nextUrl.search;
-      // }
-
-      // return NextResponse.redirect(
-      //   new URL(`/?from=${encodeURIComponent(from)}`, req.url),
-      // );
       return NextResponse.redirect(new URL('/', req.url));
     }
 

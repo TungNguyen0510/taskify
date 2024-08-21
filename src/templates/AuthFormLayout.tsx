@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@nextui-org/react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import { AppConfig } from '@/utils/AppConfig';
@@ -22,14 +21,6 @@ function AuthFormLayout({ children }: { children: React.ReactNode }) {
 
       <div className="hidden flex-col items-center gap-4 p-6 sm:flex sm:w-1/2">
         <div className="flex items-center gap-2">
-          <Image
-            priority
-            src="/assets/images/logo.png"
-            width={48}
-            height={48}
-            alt="Logo"
-            className="size-12"
-          />
           <div className="text-4xl font-bold text-white xl:text-6xl">
             {AppConfig.name}
           </div>

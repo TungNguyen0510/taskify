@@ -12,6 +12,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useLayoutEffect } from 'react';
 
 import { useUsersStore } from '@/stores/users';
+import { AppConfig } from '@/utils/AppConfig';
 
 function UserArea() {
   const session = useSession();
@@ -41,8 +42,7 @@ function UserArea() {
           name={nameIcon}
           showFallback
           src={
-            `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser?.avatar.id}` ??
-            ''
+            `${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''
           }
         />
       </DropdownTrigger>

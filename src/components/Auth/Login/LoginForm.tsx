@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -157,9 +159,9 @@ export default function LoginForm() {
           Login
         </Button>
         <p className="text-sm">
-          New here?{' '}
+          Don't have an account{' '}
           <Link href="/sign-up" className="text-sm text-blue-500 underline">
-            Create an account
+            Sign up now
           </Link>
         </p>
       </div>

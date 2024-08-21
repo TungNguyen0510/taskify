@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { useUsersStore } from '@/stores/users';
 import type { Activity } from '@/types/activity';
+import { AppConfig } from '@/utils/AppConfig';
 import { formatDateFull, getInitialsName } from '@/utils/Helpers';
 
 function ActivityCard({ activity }: { activity: Activity }) {
@@ -41,8 +42,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
             )}
             showFallback
             src={
-              `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser.avatar.id}` ??
-              ''
+              `${AppConfig.backendURL}/assets/${currentUser.avatar.id}` ?? ''
             }
           />
         )}
