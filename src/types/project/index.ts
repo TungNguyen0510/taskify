@@ -8,4 +8,5 @@ export type Project = {
   user_updated: string;
   date_updated: string;
   tasks_count: number;
+  owner: string;
 };

@@ -8,6 +8,7 @@ export type Column = {
   date_updated: string;
   project_id: string;
   isDone: boolean;
+  isTodo: boolean;
 };
 
 export type NewColumn = {

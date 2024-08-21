@@ -13,7 +13,7 @@ function AuthFormLayout({ children }: { children: React.ReactNode }) {
     <div className="relative flex h-screen items-center justify-center bg-gradient-to-r from-cyan-200 to-indigo-600 p-4">
       <Button
         color="primary"
-        variant="shadow"
+        variant="solid"
         className="absolute left-6 top-6"
         onClick={() => route.back()}
       >

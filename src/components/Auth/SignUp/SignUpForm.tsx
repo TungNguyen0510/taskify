@@ -97,18 +97,6 @@ function SignUpForm() {
         theme: 'colored',
       });
     }
-
-    // Handle other status codes
-    toast.error('An unexpected error occurred. Please try again.', {
-      position: 'bottom-left',
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: 'colored',
-    });
   };
 
   return (
@@ -120,7 +108,6 @@ function SignUpForm() {
           <div>
             <Input
               isRequired
-              isClearable
               type="text"
               labelPlacement="outside"
               variant="bordered"
@@ -138,7 +125,6 @@ function SignUpForm() {
           <div>
             <Input
               isRequired
-              isClearable
               type="text"
               labelPlacement="outside"
               label="Last name"
@@ -157,7 +143,6 @@ function SignUpForm() {
         <div className="w-full">
           <Input
             isRequired
-            isClearable
             type="email"
             labelPlacement="outside"
             variant="bordered"

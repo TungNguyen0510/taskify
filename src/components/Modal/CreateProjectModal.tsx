@@ -103,7 +103,6 @@ function CreateProjectModal(props: CreateProjectModalProps) {
           <div>
             <Input
               isRequired
-              isClearable
               autoFocus
               label="Project name"
               labelPlacement="outside"
@@ -120,7 +119,6 @@ function CreateProjectModal(props: CreateProjectModalProps) {
           <div>
             <Input
               isRequired
-              isClearable
               label="Project key"
               labelPlacement="outside"
               placeholder="Enter project key"

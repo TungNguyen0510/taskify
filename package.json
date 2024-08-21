@@ -36,6 +36,7 @@
     "@t3-oss/env-nextjs": "^0.10.1",
     "axios": "^1.7.3",
     "framer-motion": "^11.3.19",
+    "md-editor-rt": "^4.19.0",
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
     "pg": "^8.12.0",

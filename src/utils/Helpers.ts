@@ -35,7 +35,7 @@ export function formatDateMD(
   });
 }
 
-export function formatDateFull(
+export function formatDateMDY(
   dateString: string,
   locale: string = 'en-US',
 ): string {
@@ -44,6 +44,20 @@ export function formatDateFull(
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+  });
+}
+
+export function formatDateFull(
+  dateString: string,
+  locale: string = 'en-US',
+): string {
+  const date = new Date(dateString);
+  return date.toLocaleString(locale, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
@@ -57,4 +71,15 @@ export function isExpiredDate(expirationTime: string | Date): boolean {
   const expiryDate = new Date(expirationTime);
 
   return now > expiryDate;
+}
+
+export function getInitialsName(first_name: string, last_name: string) {
+  const firstInitial = first_name.charAt(0).toUpperCase();
+  const lastInitial = last_name.charAt(0).toUpperCase();
+
+  return `${firstInitial}${lastInitial}`;
+}
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

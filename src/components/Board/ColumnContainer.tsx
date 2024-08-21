@@ -143,7 +143,7 @@ function ColumnContainer(props: ColumnContainerProps) {
                   <Button
                     isIconOnly
                     color="danger"
-                    variant="shadow"
+                    variant="solid"
                     aria-label="more"
                     className="h-8"
                     onClick={() => {
@@ -156,7 +156,7 @@ function ColumnContainer(props: ColumnContainerProps) {
                   <Button
                     isIconOnly
                     color="primary"
-                    variant="shadow"
+                    variant="solid"
                     aria-label="more"
                     className="h-8"
                     isDisabled={!newStatusColumn}
@@ -235,7 +235,7 @@ function ColumnContainer(props: ColumnContainerProps) {
             <div className="flex w-full justify-end gap-2">
               <Button
                 color="primary"
-                variant="shadow"
+                variant="solid"
                 size="sm"
                 aria-label="more"
                 isDisabled={!createTaskSummary}

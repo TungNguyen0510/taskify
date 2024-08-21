@@ -24,10 +24,12 @@ import { Button, Input, ScrollShadow, Spinner } from '@nextui-org/react';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import ColumnContainer from '@/components/Board/ColumnContainer';
 import TaskCard from '@/components/Board/TaskCard';
 import Icon from '@/components/Icon';
+import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
@@ -54,6 +56,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   } = useTasksStore();
   const { currentProject, fetchCurrentProject, updateCurrentProject } =
     useProjectsStore();
+  const { createNewActivity } = useActivitiesStore();
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -177,8 +180,18 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       pos: lastPos + 1024,
     };
 
+    const newActivity = {
+      action_type: 'CREATED',
+      user_id: userId,
+      project_id: params.projectId,
+      resource_key: `${projectKey}-${currentProject.tasks_count + 1}`,
+      timestamp: new Date().toISOString(),
+    };
+
     try {
       await createNewTask(newTask);
+
+      await createNewActivity(newActivity);
       await updateCurrentProject(params.projectId, {
         tasks_count: currentProject.tasks_count + 1,
       });
@@ -193,6 +206,17 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     try {
       await deleteTask(taskId);
       await fetchListTasks(params.projectId);
+
+      toast.success('Deleted task successful!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
     } catch (error) {
       throw new Error('Failed to delete task');
     }
@@ -265,66 +289,70 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     if (isActiveATask && isOverATask) {
       // Filter tasks for columnId before find index
 
-      const columnIdHasActiveTask = tasks.find(
-        (task) => task.id === activeId,
-      )?.column_id;
+      // const columnIdHasActiveTask = tasks.find(
+      //   (task) => task.id === activeId,
+      // )?.column_id;
 
-      const columnIdHasOverTask = tasks.find(
-        (task) => task.id === overId,
-      )?.column_id;
+      // const columnIdHasOverTask = tasks.find(
+      //   (task) => task.id === overId,
+      // )?.column_id;
 
-      const listTaskOfActiveTask = tasks.filter(
-        (task) => task.column_id === columnIdHasActiveTask,
-      );
+      // const listTaskOfActiveTask = tasks.filter(
+      //   (task) => task.column_id === columnIdHasActiveTask,
+      // );
 
-      const listTaskOfOverTask = tasks.filter(
-        (task) => task.column_id === columnIdHasOverTask,
-      );
+      // const listTaskOfOverTask = tasks.filter(
+      //   (task) => task.column_id === columnIdHasOverTask,
+      // );
 
-      console.log('listTaskOfActiveTask', listTaskOfActiveTask);
-      console.log('listTaskOfOverTask', listTaskOfOverTask);
+      // console.log('listTaskOfActiveTask', listTaskOfActiveTask);
+      // console.log('listTaskOfOverTask', listTaskOfOverTask);
 
-      const activeTaskIndex = listTaskOfActiveTask.findIndex(
-        (task) => task.id === activeId,
-      );
+      // const activeTaskIndex = listTaskOfActiveTask.findIndex(
+      //   (task) => task.id === activeId,
+      // );
 
-      const overTaskIndex = listTaskOfOverTask.findIndex(
-        (task) => task.id === overId,
-      );
+      // const overTaskIndex = listTaskOfOverTask.findIndex(
+      //   (task) => task.id === overId,
+      // );
 
-      console.log('activeId', activeId);
-      console.log('overId', overId);
-      console.log('activeTaskIndex', activeTaskIndex);
-      console.log('overTaskIndex', overTaskIndex);
+      // console.log('activeId', activeId);
+      // console.log('overId', overId);
+      // console.log('activeTaskIndex', activeTaskIndex);
+      // console.log('overTaskIndex', overTaskIndex);
+
+      const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
+
+      const overTaskIndex = tasks.findIndex((task) => task.id === overId);
 
       try {
-        if (columnIdHasActiveTask === columnIdHasOverTask) {
-          await updatePositionTask(
-            activeId,
-            listTaskOfActiveTask[activeTaskIndex]!.column_id,
-            listTaskOfActiveTask[overTaskIndex]!.pos,
-          );
-          await updatePositionTask(
-            overId,
-            listTaskOfActiveTask[overTaskIndex]!.column_id,
-            listTaskOfActiveTask[activeTaskIndex]!.pos,
-          );
+        // if (columnIdHasActiveTask === columnIdHasOverTask) {
+        //   await updatePositionTask(
+        //     activeId,
+        //     listTaskOfActiveTask[activeTaskIndex]!.column_id,
+        //     listTaskOfActiveTask[overTaskIndex]!.pos,
+        //   );
+        //   await updatePositionTask(
+        //     overId,
+        //     listTaskOfActiveTask[overTaskIndex]!.column_id,
+        //     listTaskOfActiveTask[activeTaskIndex]!.pos,
+        //   );
 
-          await fetchListTasks(params.projectId);
-        }
+        //   await fetchListTasks(params.projectId);
+        // }
 
-        // await updatePositionTask(
-        //   activeId,
-        //   listTaskOfActiveTask[activeTaskIndex]!.column_id,
-        //   listTaskOfActiveTask[overTaskIndex]!.pos,
-        // );
-        // await updatePositionTask(
-        //   overId,
-        //   listTaskOfActiveTask[overTaskIndex]!.column_id,
-        //   listTaskOfActiveTask[activeTaskIndex]!.pos,
-        // );
+        await updatePositionTask(
+          activeId,
+          tasks[activeTaskIndex]!.column_id,
+          tasks[overTaskIndex]!.pos,
+        );
+        await updatePositionTask(
+          overId,
+          tasks[overTaskIndex]!.column_id,
+          tasks[activeTaskIndex]!.pos,
+        );
 
-        // await fetchListTasks(params.projectId);
+        await fetchListTasks(params.projectId);
       } catch (e) {
         throw new Error('Failed to update position task');
       }
@@ -360,7 +388,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         </div>
       ) : (
         <>
-          <div className="h-20 px-6">
+          <div className="h-20 px-4">
             {currentProject && (
               <div className="text-xl font-semibold">
                 {currentProject?.name} Board
@@ -419,7 +447,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                       <Button
                         isIconOnly
                         color="danger"
-                        variant="shadow"
+                        variant="solid"
                         aria-label="more"
                         className="h-8"
                         onClick={() => {
@@ -432,7 +460,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                       <Button
                         isIconOnly
                         color="primary"
-                        variant="shadow"
+                        variant="solid"
                         aria-label="more"
                         className="h-8"
                         isDisabled={!createColumnStatus}

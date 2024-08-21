@@ -71,7 +71,7 @@ const TaskCard = (props: TaskCardProps) => {
         >
           <div className="flex w-full gap-2 p-2">
             <div className="w-full">
-              <p className="select-none text-pretty break-words text-small hover:underline">
+              <p className="max-w-[190px] select-none text-pretty break-words text-small hover:underline">
                 {task.summary}
               </p>
             </div>
@@ -124,7 +124,7 @@ const TaskCard = (props: TaskCardProps) => {
               <div className="text-xs text-zinc-500">{task.key}</div>
             </div>
             <div>
-              <UserAssignee user={task.assignee} />
+              <UserAssignee id={task.assignee} />
             </div>
           </div>
         </Card>

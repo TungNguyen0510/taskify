@@ -13,21 +13,22 @@ export default withAuth(
     const isPublicPage = publicPages.includes(currentPath);
 
     if (isPublicPage) {
-      if (isAuth && currentPath === '/') {
+      if (isAuth && currentPath === '/login') {
         return NextResponse.redirect(new URL('/u/your-work', req.url));
       }
       return NextResponse.next();
     }
 
     if (!isAuth) {
-      let from = currentPath;
-      if (req.nextUrl.search) {
-        from += req.nextUrl.search;
-      }
+      // let from = currentPath;
+      // if (req.nextUrl.search) {
+      //   from += req.nextUrl.search;
+      // }
 
-      return NextResponse.redirect(
-        new URL(`/?from=${encodeURIComponent(from)}`, req.url),
-      );
+      // return NextResponse.redirect(
+      //   new URL(`/?from=${encodeURIComponent(from)}`, req.url),
+      // );
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     return NextResponse.next();

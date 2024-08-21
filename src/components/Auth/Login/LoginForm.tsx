@@ -95,7 +95,6 @@ export default function LoginForm() {
         <div className="w-full">
           <Input
             isRequired
-            isClearable
             type="email"
             labelPlacement="outside"
             variant="bordered"
@@ -158,7 +157,7 @@ export default function LoginForm() {
           Login
         </Button>
         <p className="text-sm">
-          New here?
+          New here?{' '}
           <Link href="/sign-up" className="text-sm text-blue-500 underline">
             Create an account
           </Link>

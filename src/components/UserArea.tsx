@@ -9,6 +9,9 @@ import {
   DropdownTrigger,
 } from '@nextui-org/react';
 import { signOut, useSession } from 'next-auth/react';
+import { useLayoutEffect } from 'react';
+
+import { useUsersStore } from '@/stores/users';
 
 function UserArea() {
   const session = useSession();
@@ -20,6 +23,15 @@ function UserArea() {
     .map((word) => word[0])
     .join('')
     .toUpperCase();
+
+  const { users, fetchListUsers } = useUsersStore();
+
+  useLayoutEffect(() => {
+    fetchListUsers();
+  }, []);
+
+  const currentUser = users.find((u: any) => u.id === user?.id);
+
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
@@ -28,7 +40,10 @@ function UserArea() {
           className="transition-transform"
           name={nameIcon}
           showFallback
-          src={user?.image ?? ''}
+          src={
+            `${process.env.NEXT_PUBLIC_DIRECTUS_API}/assets/${currentUser?.avatar.id}` ??
+            ''
+          }
         />
       </DropdownTrigger>
       <DropdownMenu aria-label="Profile Actions" variant="flat">

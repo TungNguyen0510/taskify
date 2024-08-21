@@ -29,6 +29,7 @@ const initialState: State = {
     user_updated: '',
     date_updated: '',
     tasks_count: 0,
+    owner: '',
   },
 };
 
@@ -71,17 +72,22 @@ export const useProjectsStore = create<State & Actions>()(
             {
               status: 'To Do',
               project_id: response.data.data.id,
+              isDone: false,
+              isTodo: true,
               pos: 1,
             },
             {
               status: 'In Progress',
               project_id: response.data.data.id,
+              isDone: false,
+              isTodo: false,
               pos: 2,
             },
             {
               status: 'Done',
               project_id: response.data.data.id,
               isDone: true,
+              isTodo: false,
               pos: 3,
             },
           ]);

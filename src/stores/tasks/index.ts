@@ -15,6 +15,7 @@ type Actions = {
   updatePositionTask: (taskId: any, columnId: any, pos?: number) => void;
   deleteTask: (taskId: string) => void;
   fetchTaskDetails: (taskId: string) => void;
+  updateTaskDetails: (taskId: string, data: any) => void;
   reset: () => void;
 };
 
@@ -63,6 +64,10 @@ export const useTasksStore = create<State & Actions>()(
         fetchTaskDetails: async (taskId: any) => {
           const response = await api.get<any>(`/items/Task/${taskId}`);
           set({ taskDetails: response.data.data });
+        },
+
+        updateTaskDetails: async (taskId: any, data: any) => {
+          await api.patch(`/items/Task/${taskId}`, data);
         },
 
         reset: () => {
