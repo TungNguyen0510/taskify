@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/TungNguyen0510/taskify/compare/v1.3.0...v1.4.0) (2024-08-21)
+
+
+### Features
+
+* list page ([50db3b9](https://github.com/TungNguyen0510/taskify/commit/50db3b97c1e675935e2aa2d44e405b4c01e9917a))
+
 # [1.3.0](https://github.com/TungNguyen0510/taskify/compare/v1.2.0...v1.3.0) (2024-08-19)
 
 
