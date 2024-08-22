@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/TungNguyen0510/taskify/compare/v1.5.0...v1.6.0) (2024-08-22)
+
+
+### Features
+
+* wip ([a649f80](https://github.com/TungNguyen0510/taskify/commit/a649f8024b5d674b702ef7543f5ffbd82d8fbeab))
+
 # [1.5.0](https://github.com/TungNguyen0510/taskify/compare/v1.4.0...v1.5.0) (2024-08-21)
 
 
