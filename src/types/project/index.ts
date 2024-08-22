@@ -1,3 +1,12 @@
+import type { Role } from '@/types/role';
+
+export type ProjectMember = {
+  id: number;
+  Project_id: string;
+  directus_users_id: string;
+  project_role: Role;
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -9,4 +18,5 @@ export type Project = {
   date_updated: string;
   tasks_count: number;
   owner: string;
+  project_members: ProjectMember[];
 };

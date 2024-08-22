@@ -33,8 +33,11 @@ import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
-import type { Column, NewColumn, NewTask, Task } from '@/types/board';
-import { resetAllStores } from '@/utils/Helpers';
+import { useUsersStore } from '@/stores/users';
+import type { NewActivity } from '@/types/activity';
+import type { Column, NewColumn } from '@/types/board';
+import type { NewTask, Task } from '@/types/task';
+import { generateUUID, resetAllStores } from '@/utils/Helpers';
 
 function KanbanBoard({ params }: { params: { projectId: string } }) {
   const session = useSession();
@@ -57,6 +60,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   const { currentProject, fetchCurrentProject, updateCurrentProject } =
     useProjectsStore();
   const { createNewActivity } = useActivitiesStore();
+  const { fetchListUsers } = useUsersStore();
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -68,31 +72,22 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   const [createColumnStatus, setCreateColumnStatus] = useState<string>('');
   const [isCreatingColumn, setIsCreatingColumn] = useState<boolean>(false);
 
-  const fetchData = (projectId: string) => {
-    fetchCurrentProject(projectId);
-    fetchListColumns(projectId);
-    fetchListTasks(projectId);
-  };
-
   useEffect(() => {
-    setIsLoading(true);
-    resetAllStores();
-    fetchData(params.projectId);
-    setIsLoading(false);
-  }, []);
+    const fetchData = async (projectId: string) => {
+      setIsLoading(true);
+      resetAllStores();
+      Promise.all([
+        fetchListUsers(),
+        fetchCurrentProject(projectId),
+        fetchListColumns(projectId),
+        fetchListTasks(projectId),
+      ]);
 
-  // DND Handlers
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { delay: 100, tolerance: 5 },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 100, tolerance: 5 },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+      setIsLoading(false);
+    };
+
+    fetchData(params.projectId);
+  }, []);
 
   const createNewColumn = async () => {
     setIsCreatingColumn(true);
@@ -161,30 +156,31 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   };
 
   const createTask = async (columnId: string, summary: string) => {
-    if (!userId) return;
+    if (!userId || currentProject === null) return;
 
     const currentColumnTasks = tasks
       .filter((task) => task.column_id === columnId)
       .sort((a, b) => a.pos - b.pos);
 
-    const projectKey = currentProject?.key;
-
     const lastPos = currentColumnTasks[currentColumnTasks.length - 1]?.pos ?? 0;
 
+    const taskId = generateUUID();
+
     const newTask: NewTask = {
+      id: taskId,
       reporter: userId,
       project_id: params.projectId,
       column_id: columnId,
       summary,
-      key: `${projectKey}-${currentProject.tasks_count + 1}`,
+      key: `${currentProject.tasks_count + 1}`,
       pos: lastPos + 1024,
     };
 
-    const newActivity = {
+    const newActivity: NewActivity = {
       action_type: 'CREATED',
       user_id: userId,
       project_id: params.projectId,
-      resource_key: `${projectKey}-${currentProject.tasks_count + 1}`,
+      resource_id: taskId,
       timestamp: new Date().toISOString(),
     };
 
@@ -221,6 +217,21 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       throw new Error('Failed to delete task');
     }
   };
+
+  // DND Handlers
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 100, tolerance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 100, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // Drag & Drop Event Handlers
 
   const onDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
@@ -341,18 +352,20 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         //   await fetchListTasks(params.projectId);
         // }
 
-        await updatePositionTask(
-          activeId,
-          tasks[activeTaskIndex]!.column_id,
-          tasks[overTaskIndex]!.pos,
-        );
-        await updatePositionTask(
-          overId,
-          tasks[overTaskIndex]!.column_id,
-          tasks[activeTaskIndex]!.pos,
-        );
+        await Promise.all([
+          updatePositionTask(
+            activeId,
+            tasks[activeTaskIndex]!.column_id,
+            tasks[overTaskIndex]!.pos,
+          ),
+          updatePositionTask(
+            overId,
+            tasks[overTaskIndex]!.column_id,
+            tasks[activeTaskIndex]!.pos,
+          ),
 
-        await fetchListTasks(params.projectId);
+          fetchListTasks(params.projectId),
+        ]);
       } catch (e) {
         throw new Error('Failed to update position task');
       }
@@ -367,8 +380,10 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         if (tasks[activeTaskIndex]) {
           // caculate new pos
 
-          await updatePositionTask(activeId, overId);
-          await fetchListTasks(params.projectId);
+          await Promise.all([
+            updatePositionTask(activeId, overId),
+            fetchListTasks(params.projectId),
+          ]);
         }
       } catch (e) {
         throw new Error('Failed to update position task');
@@ -376,143 +391,140 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[calc(100vh-56px)] w-full min-w-[calc(100vw-256px)] items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   if (!userId) {
     return notFound();
   }
 
   return (
-    <div>
-      {isLoading ? (
-        <div className="flex min-h-[calc(100vh-56px)] w-full min-w-[calc(100vw-256px)] items-center justify-center">
-          <Spinner size="lg" />
-        </div>
-      ) : (
-        <>
-          <div className="h-20 px-4">
-            {currentProject && (
-              <div className="text-xl font-semibold">
-                {currentProject?.name} Board
-              </div>
-            )}
+    <>
+      <div className="h-20 px-4">
+        {currentProject && (
+          <div className="text-xl font-semibold">
+            {currentProject.name} Board
           </div>
-          <ScrollShadow
-            orientation="horizontal"
-            className="scrollbar-1 flex min-h-[calc(100vh-56px-80px-16px)] w-full gap-4 overflow-y-hidden px-4 py-2"
-          >
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCorners}
-              onDragStart={onDragStart}
-              onDragEnd={onDragEnd}
-              onDragOver={onDragOver}
-            >
-              <div className="flex gap-4">
-                <SortableContext items={columnsId}>
-                  {columns
-                    .sort((a, b) => a.pos - b.pos)
-                    .map((col) => (
-                      <ColumnContainer
-                        column={col}
-                        key={col.id}
-                        tasks={tasks
-                          .filter((task) => task.column_id === col.id)
-                          .sort((a, b) => a.pos - b.pos)}
-                        deleteColumn={deleteCurrentColumn}
-                        updateStatusColumn={updateCurrentStatusColumn}
-                        createTask={createTask}
-                        deleteTask={deleteCurrentTask}
-                      />
-                    ))}
-                </SortableContext>
+        )}
+      </div>
+      <ScrollShadow
+        orientation="horizontal"
+        className="scrollbar-1 flex min-h-[calc(100vh-56px-80px-16px)] w-full gap-4 overflow-y-hidden px-4 py-2"
+      >
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+        >
+          <div className="flex gap-4">
+            <SortableContext items={columnsId}>
+              {columns
+                .sort((a, b) => a.pos - b.pos)
+                .map((col) => (
+                  <ColumnContainer
+                    column={col}
+                    key={col.id}
+                    tasks={tasks
+                      .filter((task) => task.column_id === col.id)
+                      .sort((a, b) => a.pos - b.pos)}
+                    deleteColumn={deleteCurrentColumn}
+                    updateStatusColumn={updateCurrentStatusColumn}
+                    createTask={createTask}
+                    deleteTask={deleteCurrentTask}
+                  />
+                ))}
+            </SortableContext>
 
-                {isCreatingColumn ? (
-                  <div className="flex min-w-64 flex-col gap-1 pr-20">
-                    <Input
-                      autoFocus
-                      type="text"
-                      size="lg"
-                      variant="bordered"
-                      radius="sm"
-                      value={createColumnStatus}
-                      maxLength={30}
-                      className="min-w-64"
-                      onChange={(e) => setCreateColumnStatus(e.target.value)}
-                      onKeyDown={(event) => {
-                        if (event.key !== 'Enter') return;
-                        createNewColumn();
-                        setIsCreatingColumn(false);
-                      }}
-                    />
-                    <div className="flex w-full justify-end gap-2">
-                      <Button
-                        isIconOnly
-                        color="danger"
-                        variant="solid"
-                        aria-label="more"
-                        className="h-8"
-                        onClick={() => {
-                          setCreateColumnStatus('');
-                          setIsCreatingColumn(false);
-                        }}
-                      >
-                        <Icon name="close" />
-                      </Button>
-                      <Button
-                        isIconOnly
-                        color="primary"
-                        variant="solid"
-                        aria-label="more"
-                        className="h-8"
-                        isDisabled={!createColumnStatus}
-                        onClick={() => {
-                          createNewColumn();
-                          setIsCreatingColumn(false);
-                        }}
-                      >
-                        <Icon name="checked" />
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
+            {isCreatingColumn ? (
+              <div className="flex min-w-64 flex-col gap-1 pr-20">
+                <Input
+                  autoFocus
+                  type="text"
+                  size="lg"
+                  variant="bordered"
+                  radius="sm"
+                  value={createColumnStatus}
+                  maxLength={30}
+                  className="min-w-64"
+                  onChange={(e) => setCreateColumnStatus(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'Enter') return;
+                    createNewColumn();
+                    setIsCreatingColumn(false);
+                  }}
+                />
+                <div className="flex w-full justify-end gap-2">
                   <Button
-                    color="default"
-                    variant="bordered"
-                    radius="sm"
-                    className="mr-10 min-w-36"
-                    startContent={<Icon name="plus" />}
-                    onClick={() => setIsCreatingColumn(true)}
+                    isIconOnly
+                    color="danger"
+                    variant="solid"
+                    aria-label="more"
+                    className="h-8"
+                    onClick={() => {
+                      setCreateColumnStatus('');
+                      setIsCreatingColumn(false);
+                    }}
                   >
-                    Add column
+                    <Icon name="close" />
                   </Button>
-                )}
-
-                <DragOverlay adjustScale={false}>
-                  {activeColumn && (
-                    <ColumnContainer
-                      column={activeColumn}
-                      tasks={tasks
-                        .filter((task) => task.column_id === activeColumn.id)
-                        .sort((a, b) => a.pos - b.pos)}
-                      deleteColumn={deleteCurrentColumn}
-                      updateStatusColumn={updateCurrentStatusColumn}
-                      createTask={createTask}
-                      deleteTask={deleteCurrentTask}
-                    />
-                  )}
-
-                  {activeTask && (
-                    <TaskCard
-                      task={activeTask}
-                      deleteTask={deleteCurrentTask}
-                    />
-                  )}
-                </DragOverlay>
+                  <Button
+                    isIconOnly
+                    color="primary"
+                    variant="solid"
+                    aria-label="more"
+                    className="h-8"
+                    isDisabled={!createColumnStatus}
+                    onClick={() => {
+                      createNewColumn();
+                      setIsCreatingColumn(false);
+                    }}
+                  >
+                    <Icon name="checked" />
+                  </Button>
+                </div>
               </div>
-            </DndContext>
-          </ScrollShadow>
-        </>
-      )}
-    </div>
+            ) : (
+              <Button
+                color="default"
+                variant="bordered"
+                radius="sm"
+                className="mr-10 min-w-36"
+                startContent={<Icon name="plus" />}
+                onClick={() => setIsCreatingColumn(true)}
+              >
+                Add column
+              </Button>
+            )}
+
+            <DragOverlay adjustScale={false}>
+              {activeColumn && (
+                <ColumnContainer
+                  column={activeColumn}
+                  tasks={tasks
+                    .filter((task) => task.column_id === activeColumn.id)
+                    .sort((a, b) => a.pos - b.pos)}
+                  deleteColumn={deleteCurrentColumn}
+                  updateStatusColumn={updateCurrentStatusColumn}
+                  createTask={createTask}
+                  deleteTask={deleteCurrentTask}
+                />
+              )}
+
+              {activeTask && (
+                <TaskCard task={activeTask} deleteTask={deleteCurrentTask} />
+              )}
+            </DragOverlay>
+          </div>
+        </DndContext>
+      </ScrollShadow>
+    </>
   );
 }
 

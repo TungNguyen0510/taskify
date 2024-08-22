@@ -34,6 +34,8 @@ export default function LoginForm() {
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  const [errMsg, setErrMsg] = useState('');
+
   const {
     handleSubmit,
     register,
@@ -58,6 +60,7 @@ export default function LoginForm() {
     });
 
     if (res?.status === 401) {
+      setErrMsg('Email address or password is invalid');
       toast.error('Email address or password is invalid', {
         position: 'bottom-left',
         autoClose: 2000,
@@ -71,6 +74,7 @@ export default function LoginForm() {
     }
 
     if (res?.status === 200) {
+      setErrMsg('');
       router.push(`/u/your-work`);
       router.refresh();
 
@@ -139,6 +143,8 @@ export default function LoginForm() {
             </p>
           )}
         </div>
+
+        <div>{errMsg && <p className="text-base text-danger">{errMsg}</p>}</div>
 
         <div className="flex w-full justify-end">
           <Link

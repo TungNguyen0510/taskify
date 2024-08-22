@@ -25,6 +25,7 @@ import { toast } from 'react-toastify';
 
 import Icon from '@/components/Icon';
 import { useColumnsStore } from '@/stores/columns';
+import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
 import { useUsersStore } from '@/stores/users';
 import type { Column } from '@/types/board';
@@ -70,6 +71,7 @@ export default function ListTasks({
   const { tasks, fetchListTasks, deleteTask } = useTasksStore();
   const { fetchListUsers } = useUsersStore();
   const { columns, fetchListColumns } = useColumnsStore();
+  const { fetchCurrentProject } = useProjectsStore();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -80,6 +82,18 @@ export default function ListTasks({
     useState<boolean>(false);
 
   const [currentTaskId, setCurrentTaskId] = useState<string>('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchListUsers();
+      await fetchCurrentProject(params.projectId);
+      await fetchListColumns(params.projectId);
+      await fetchListTasks(params.projectId);
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, []);
 
   const deleteCurrentTask = async (taskId: string) => {
     try {
@@ -97,22 +111,20 @@ export default function ListTasks({
         theme: 'colored',
       });
     } catch (error) {
+      toast.error('Deleted task failed!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
       throw new Error('Failed to delete task');
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchListUsers();
-      await fetchListColumns(params.projectId);
-
-      await fetchListTasks(params.projectId);
-
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, []);
 
   const getStatusColor = (column: Column) => {
     if (column.isDone) {
@@ -201,6 +213,17 @@ export default function ListTasks({
     const cellValue = task[columnKey];
 
     switch (columnKey) {
+      case 'key':
+        return (
+          <div className="flex items-center gap-1">
+            <div className="size-4">
+              <Icon name="checkSquare" />
+            </div>
+            <div className="text-xs text-zinc-500">
+              {useProjectsStore.getState().currentProject?.key}-{task.key}
+            </div>
+          </div>
+        );
       case 'assignee':
         return (
           <div>
@@ -299,7 +322,7 @@ export default function ListTasks({
                     setCurrentTaskId(task.id);
                   }}
                 >
-                  View
+                  Details
                 </DropdownItem>
                 <DropdownItem
                   className="font-semibold text-danger"

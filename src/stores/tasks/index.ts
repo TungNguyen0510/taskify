@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
-import type { NewTask, Task } from '@/types/board';
+import type { NewTask, Task } from '@/types/task';
 import api from '@/utils/axiosInstance';
 
 type State = {

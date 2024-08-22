@@ -19,15 +19,19 @@ function AvatarUser(props: AvatarUserProps) {
     <div className="flex items-center gap-1.5">
       <Avatar
         size="sm"
-        name={getInitialsName(currentUser?.first_name, currentUser?.last_name)}
+        name={
+          currentUser?.first_name && currentUser?.first_name
+            ? getInitialsName(currentUser.first_name, currentUser.first_name)
+            : ''
+        }
         showFallback
         src={`${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''}
       />
 
       <div>
-        {currentUser
+        {currentUser?.first_name && currentUser?.first_name
           ? `${currentUser?.first_name} ${currentUser?.last_name}`
-          : ''}
+          : 'None'}
       </div>
     </div>
   );

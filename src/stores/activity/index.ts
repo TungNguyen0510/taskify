@@ -22,11 +22,11 @@ export const useActivitiesStore = create<State & Actions>()(
     persist(
       (set) => ({
         ...initialState,
-        fetchListActivities: async (key: string) => {
+        fetchListActivities: async (id: string) => {
           const response = await api.get<any>('/items/ActivityLog', {
             params: {
               filter: {
-                resource_key: key,
+                resource_id: id,
               },
               sort: ['-timestamp'],
             },

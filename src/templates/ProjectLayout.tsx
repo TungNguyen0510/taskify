@@ -1,7 +1,9 @@
+/* eslint-disable consistent-return */
+
 'use client';
 
 import { Divider } from '@nextui-org/react';
-import { usePathname, useRouter } from 'next/navigation';
+import { notFound, usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 
@@ -40,12 +42,25 @@ const ProjectLayout = (props: {
   };
 
   const session = useSession();
+  const userId = session?.data?.user.id;
 
   const { currentProject, fetchCurrentProject } = useProjectsStore();
 
   useEffect(() => {
     fetchCurrentProject(props.params.projectId);
   }, [props.params.projectId, fetchCurrentProject]);
+
+  useEffect(() => {
+    if (currentProject) {
+      const isMemberOfProject = currentProject.project_members.some(
+        (item) => item.directus_users_id === userId,
+      );
+
+      if (!isMemberOfProject) {
+        return notFound();
+      }
+    }
+  }, [currentProject, userId]);
 
   return (
     <div className="flex">
@@ -66,7 +81,7 @@ const ProjectLayout = (props: {
           </div>
         ))}
 
-        {session.data?.user.id === currentProject.owner ? (
+        {session.data?.user.id === currentProject?.owner ? (
           <div className="mt-20">
             <Divider className="mx-4 my-2 w-[calc(100%-2rem)]" />
             <div className="flex h-12 items-center px-4">

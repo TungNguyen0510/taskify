@@ -1,4 +1,4 @@
-import SettingsPage from '@/components/Settings/SettingsPage';
+import ProjectSettingsPage from '@/components/Settings/ProjectSettingsPage';
 
 export async function generateMetadata() {
   return {
@@ -13,7 +13,7 @@ export default function ListPage({
 }) {
   return (
     <div>
-      <SettingsPage params={params} />
+      <ProjectSettingsPage params={params} />
     </div>
   );
 }

@@ -42,7 +42,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
             )}
             showFallback
             src={
-              `${AppConfig.backendURL}/assets/${currentUser.avatar.id}` ?? ''
+              `${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''
             }
           />
         )}

@@ -18,9 +18,12 @@ import { useEffect, useState } from 'react';
 import ActivityCard from '@/components/ActivityCard';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useActivitiesStore } from '@/stores/activity';
+import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
+import type { NewActivity } from '@/types/activity';
 import { formatDateFull, isExpiredDate } from '@/utils/Helpers';
 
+import AvatarUser from '../AvatarUser';
 import Icon from '../Icon';
 
 interface TaskDetailsModalProps {
@@ -42,6 +45,10 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
   const { activities, fetchListActivities, createNewActivity } =
     useActivitiesStore();
 
+  const { currentProject } = useProjectsStore();
+
+  const projectKey = currentProject?.key;
+
   // const { columns } = useColumnsStore();
 
   useEffect(() => {
@@ -56,8 +63,8 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   useEffect(() => {
     const fetchActivities = async () => {
-      if (taskDetails?.key) {
-        await fetchListActivities(taskDetails.key);
+      if (taskDetails?.id) {
+        await fetchListActivities(taskDetails.id);
       }
     };
 
@@ -90,49 +97,53 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
   // }));
 
   const updateSummary = async () => {
-    const newActivity = {
-      action_type: 'UPDATED',
-      field: 'Summary',
-      user_id: currentUser?.id,
-      project_id: taskDetails?.project_id,
-      resource_key: taskDetails?.key,
-      timestamp: new Date().toISOString(),
-    };
+    if (currentUser?.id && taskDetails) {
+      const newActivity: NewActivity = {
+        action_type: 'UPDATED',
+        field: 'Summary',
+        user_id: currentUser.id,
+        project_id: taskDetails.project_id,
+        resource_id: taskDetails.id,
+        timestamp: new Date().toISOString(),
+      };
 
-    setIsLoading(true);
-    await updateTaskDetails(taskId, {
-      summary: newSummary,
-    });
+      setIsLoading(true);
+      await updateTaskDetails(taskId, {
+        summary: newSummary,
+      });
 
-    await createNewActivity(newActivity);
-    await fetchTaskDetails(taskId);
+      await createNewActivity(newActivity);
+      await fetchTaskDetails(taskId);
 
-    if (taskDetails?.project_id) {
-      await fetchListActivities(taskDetails.key);
-      await fetchListTasks(taskDetails.project_id);
+      if (taskDetails?.project_id) {
+        await fetchListActivities(taskDetails.id);
+        await fetchListTasks(taskDetails.project_id);
+      }
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const updateDescription = async () => {
-    const newActivity = {
-      action_type: 'UPDATED',
-      field: 'Description',
-      user_id: currentUser?.id,
-      project_id: taskDetails?.project_id,
-      resource_key: taskDetails?.key,
-      timestamp: new Date().toISOString(),
-    };
+    if (currentUser?.id && taskDetails) {
+      const newActivity: NewActivity = {
+        action_type: 'UPDATED',
+        field: 'Description',
+        user_id: currentUser?.id,
+        project_id: taskDetails.project_id,
+        resource_id: taskDetails.id,
+        timestamp: new Date().toISOString(),
+      };
 
-    await updateTaskDetails(taskId, {
-      description: newDescription,
-    });
-    await createNewActivity(newActivity);
-    await fetchTaskDetails(taskId);
+      await updateTaskDetails(taskId, {
+        description: newDescription,
+      });
+      await createNewActivity(newActivity);
+      await fetchTaskDetails(taskId);
 
-    if (taskDetails?.project_id) {
-      await fetchListActivities(taskDetails.key);
-      await fetchListTasks(taskDetails.project_id);
+      if (taskDetails?.project_id) {
+        await fetchListActivities(taskDetails.id);
+        await fetchListTasks(taskDetails.project_id);
+      }
     }
   };
 
@@ -150,11 +161,13 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
             <div className="size-4">
               <Icon name="checkSquare" />
             </div>
-            <div className="text-xs text-zinc-500">{taskDetails?.key}</div>
+            <div className="text-xs text-zinc-500">
+              {projectKey}-{taskDetails?.key}
+            </div>
           </div>
         </ModalHeader>
         <ModalBody>
-          <div className="scrollbar-2 flex flex-col gap-2 overflow-y-auto md:flex-row">
+          <div className="scrollbar-2 flex h-[calc(100vh-6em)] flex-col gap-4 overflow-y-auto md:flex-row">
             <div className="scrollbar-2 flex h-[calc(100vh-6em)] w-full flex-col gap-4 overflow-y-auto px-2 pb-6 md:w-3/5">
               <div className="w-full">
                 {!isEditSummary ? (
@@ -405,9 +418,17 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                   Details
                 </div>
                 <div className="flex flex-col gap-6 p-4">
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <div className="min-w-20 text-slate-500">Assignee</div>
-                    <div>1</div>
+                    <div className="w-full cursor-pointer">
+                      {taskDetails?.assignee ? (
+                        <AvatarUser userId={taskDetails.assignee} />
+                      ) : (
+                        <div className="w-full rounded-md px-2 py-1 hover:bg-zinc-100 hover:text-zinc-900">
+                          None
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -467,9 +488,11 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <div className="min-w-20 text-slate-500">Reporter</div>
-                    <div>1</div>
+                    <div>
+                      <AvatarUser userId={taskDetails?.reporter ?? ''} />
+                    </div>
                   </div>
                 </div>
               </div>

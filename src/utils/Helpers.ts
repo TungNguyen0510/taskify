@@ -1,6 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
+
+import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
+import { useUsersStore } from '@/stores/users';
 
 export const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_APP_URL) {
@@ -18,6 +22,8 @@ export const resetAllStores = () => {
   useColumnsStore.getState().reset();
   useProjectsStore.getState().reset();
   useTasksStore.getState().reset();
+  useUsersStore.getState().reset();
+  useActivitiesStore.getState().reset();
 };
 
 export const handleError = (error: string) => {
@@ -82,4 +88,8 @@ export function getInitialsName(first_name: string, last_name: string) {
 
 export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function generateUUID(): string {
+  return uuidv4();
 }

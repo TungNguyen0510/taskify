@@ -6,7 +6,7 @@ import api from '@/utils/axiosInstance';
 
 type State = {
   projects: Project[];
-  currentProject: Project;
+  currentProject: Project | null;
 };
 
 type Actions = {
@@ -19,18 +19,7 @@ type Actions = {
 
 const initialState: State = {
   projects: [],
-  currentProject: {
-    id: '',
-    name: '',
-    key: '',
-    description: '',
-    user_created: '',
-    date_created: '',
-    user_updated: '',
-    date_updated: '',
-    tasks_count: 0,
-    owner: '',
-  },
+  currentProject: null,
 };
 
 export const useProjectsStore = create<State & Actions>()(
@@ -56,7 +45,7 @@ export const useProjectsStore = create<State & Actions>()(
         fetchCurrentProject: async (projectId: string) => {
           const response = await api.get<any>(`/items/Project/${projectId}`, {
             params: {
-              fields: '*',
+              fields: '*,project_members.*',
             },
           });
           set({ currentProject: response.data.data });
@@ -99,7 +88,7 @@ export const useProjectsStore = create<State & Actions>()(
       }),
       {
         name: 'projects-storage',
-        storage: createJSONStorage(() => sessionStorage),
+        storage: createJSONStorage(() => localStorage),
       },
     ),
   ),
