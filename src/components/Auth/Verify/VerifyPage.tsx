@@ -4,7 +4,7 @@
 
 import { Button, Card, Spinner } from '@nextui-org/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { AppConfig } from '@/utils/AppConfig';
@@ -100,49 +100,51 @@ function VerifyPage() {
   }, []);
 
   return (
-    <div className="relative flex h-screen w-screen items-center justify-center bg-gradient-to-r from-cyan-200 to-indigo-600 p-4">
-      <Button
-        color="primary"
-        variant="ghost"
-        className="absolute left-6 top-6"
-        onClick={() => route.back()}
-      >
-        Back
-      </Button>
+    <Suspense>
+      <div className="relative flex h-screen w-screen items-center justify-center bg-gradient-to-r from-cyan-200 to-indigo-600 p-4">
+        <Button
+          color="primary"
+          variant="ghost"
+          className="absolute left-6 top-6"
+          onClick={() => route.back()}
+        >
+          Back
+        </Button>
 
-      {isLoading ? (
-        <Spinner size="lg" />
-      ) : (
-        <Card>
-          <div className="flex flex-col items-center justify-center gap-4 p-6">
-            {status && (
-              <div
-                className={`${getTextColor(status.type)} text-xl md:text-3xl`}
-              >
-                {status.mess}
+        {isLoading ? (
+          <Spinner size="lg" />
+        ) : (
+          <Card>
+            <div className="flex flex-col items-center justify-center gap-4 p-6">
+              {status && (
+                <div
+                  className={`${getTextColor(status.type)} text-xl md:text-3xl`}
+                >
+                  {status.mess}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  color="default"
+                  className="w-full"
+                  onPress={() => route.push('/')}
+                >
+                  Go to home
+                </Button>
+                <Button
+                  color="primary"
+                  className="w-full"
+                  onPress={() => route.push('/login')}
+                >
+                  Sign in
+                </Button>
               </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              <Button
-                color="default"
-                className="w-full"
-                onPress={() => route.push('/')}
-              >
-                Go to home
-              </Button>
-              <Button
-                color="primary"
-                className="w-full"
-                onPress={() => route.push('/login')}
-              >
-                Sign in
-              </Button>
             </div>
-          </div>
-        </Card>
-      )}
-    </div>
+          </Card>
+        )}
+      </div>
+    </Suspense>
   );
 }
 

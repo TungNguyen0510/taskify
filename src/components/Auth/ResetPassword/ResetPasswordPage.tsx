@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import AuthFormLayout from '@/templates/AuthFormLayout';
 
 import ResetPasswordForm from './ResetPasswordForm';
@@ -5,7 +7,9 @@ import ResetPasswordForm from './ResetPasswordForm';
 export default async function ResetPasswordPage() {
   return (
     <AuthFormLayout>
-      <ResetPasswordForm />
+      <Suspense>
+        <ResetPasswordForm />
+      </Suspense>
     </AuthFormLayout>
   );
 }
