@@ -24,12 +24,12 @@ export default function Layout(props: { children: React.ReactNode }) {
             <span>{AppConfig.name}</span>
           </Link>
 
-          <Link
+          {/* <Link
             href="/about/"
             className="font-semibold text-black hover:text-blue-500"
           >
             About
-          </Link>
+          </Link> */}
         </>
       }
       rightNav={

@@ -12,7 +12,9 @@ function StatusChip(props: StatusChipProps) {
 
   const { columns } = useColumnsStore();
 
-  const getStatusColor = (column: Column) => {
+  const getStatusColor = (
+    column: Column,
+  ): 'success' | 'default' | 'primary' => {
     if (column.isDone) {
       return 'success';
     }
@@ -34,7 +36,7 @@ function StatusChip(props: StatusChipProps) {
     <div>
       <Chip
         className="capitalize"
-        color={currentStatus?.color ? currentStatus?.color : 'default'}
+        color={currentStatus?.color ?? 'default'}
         size="sm"
         variant="flat"
       >
@@ -43,5 +45,4 @@ function StatusChip(props: StatusChipProps) {
     </div>
   );
 }
-
 export default StatusChip;

@@ -11,6 +11,7 @@ import {
   DropdownTrigger,
   Input,
   Pagination,
+  type SortDescriptor,
   Spinner,
   Table,
   TableBody,
@@ -29,6 +30,7 @@ import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
 import { useUsersStore } from '@/stores/users';
 import type { Column } from '@/types/board';
+import type { Task } from '@/types/task';
 import {
   capitalize,
   formatDateFull,
@@ -85,10 +87,12 @@ export default function ListTasks({
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchListUsers();
-      await fetchCurrentProject(params.projectId);
-      await fetchListColumns(params.projectId);
-      await fetchListTasks(params.projectId);
+      await Promise.all([
+        fetchListUsers(),
+        fetchCurrentProject(params.projectId),
+        fetchListColumns(params.projectId),
+        fetchListTasks(params.projectId),
+      ]);
       setIsLoading(false);
     };
 
@@ -143,11 +147,18 @@ export default function ListTasks({
   }));
 
   const [filterValue, setFilterValue] = React.useState('');
-  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
+  // const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
-  const [statusFilter, setStatusFilter] = React.useState('all');
+  const [statusFilter, setStatusFilter] = React.useState(
+    new Set(columns.map((item) => item.id)),
+  );
+
+  useEffect(() => {
+    setStatusFilter(new Set(columns.map((item) => item.id)));
+  }, [columns]);
+
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: 'key',
@@ -171,14 +182,10 @@ export default function ListTasks({
         task.summary.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
-    if (
-      statusFilter !== 'all' &&
-      Array.from(statusFilter).length !== statusOptions.length
-    ) {
-      filteredTasks = filteredTasks.filter((task) =>
-        Array.from(statusFilter).includes(task.column_id),
-      );
-    }
+
+    filteredTasks = filteredTasks.filter((task) =>
+      Array.from(statusFilter).includes(task.column_id),
+    );
 
     return filteredTasks;
   }, [tasks, filterValue, statusFilter]);
@@ -194,10 +201,12 @@ export default function ListTasks({
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column];
-      const second = b[sortDescriptor.column];
+      const first = a[sortDescriptor.column as keyof Task];
+      const second = b[sortDescriptor.column as keyof Task];
       let cmp;
-      if (first < second) {
+      if (first === null || second === null) {
+        cmp = 0;
+      } else if (first < second) {
         cmp = -1;
       } else if (first > second) {
         cmp = 1;
@@ -379,7 +388,7 @@ export default function ListTasks({
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <Input
-            className="w-full sm:max-w-[44%]"
+            className="w-full sm:max-w-[34%]"
             placeholder="Search by summary..."
             startContent={<Icon name="search" />}
             value={filterValue}
@@ -402,7 +411,9 @@ export default function ListTasks({
                 closeOnSelect={false}
                 selectedKeys={statusFilter}
                 selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
+                onSelectionChange={(keys: 'all' | Set<React.Key>) =>
+                  setStatusFilter(keys as any)
+                }
               >
                 {statusOptions.map((status) => (
                   <DropdownItem key={status.uid} className="capitalize">
@@ -426,7 +437,9 @@ export default function ListTasks({
                 closeOnSelect={false}
                 selectedKeys={visibleColumns}
                 selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
+                onSelectionChange={(keys: 'all' | Set<React.Key>) =>
+                  setVisibleColumns(keys as any)
+                }
               >
                 {headers.map((column) => (
                   <DropdownItem key={column.uid} className="capitalize">
@@ -436,7 +449,7 @@ export default function ListTasks({
               </DropdownMenu>
             </Dropdown>
             <Button color="primary" endContent={<Icon name="plus" />}>
-              Add New
+              Add New Task
             </Button>
           </div>
         </div>
@@ -471,11 +484,11 @@ export default function ListTasks({
   const bottomContent = React.useMemo(() => {
     return (
       <div className="flex items-center justify-between p-2">
-        <span className="w-[30%] text-small text-default-400">
+        {/* <span className="w-[30%] text-small text-default-400">
           {selectedKeys === 'all'
             ? 'All items selected'
             : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span>
+        </span> */}
         <Pagination
           isCompact
           showControls
@@ -506,7 +519,7 @@ export default function ListTasks({
       </div>
     );
   }, [
-    selectedKeys,
+    // selectedKeys,
     filteredItems.length,
     page,
     pages,
@@ -548,13 +561,15 @@ export default function ListTasks({
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={classNames}
-        selectedKeys={selectedKeys}
-        selectionMode="multiple"
-        sortDescriptor={sortDescriptor}
+        // selectedKeys={selectedKeys}
+        // selectionMode="multiple"
+        sortDescriptor={sortDescriptor as SortDescriptor}
         topContent={topContent}
         topContentPlacement="outside"
-        onSelectionChange={setSelectedKeys}
-        onSortChange={setSortDescriptor}
+        // onSelectionChange={setSelectedKeys}
+        onSortChange={(descriptor: SortDescriptor) =>
+          setSortDescriptor(descriptor as any)
+        }
       >
         <TableHeader columns={headerColumns}>
           {(column) => (
@@ -562,7 +577,6 @@ export default function ListTasks({
               key={column.uid}
               align={column.uid === 'actions' ? 'center' : 'start'}
               allowsSorting={column.sortable}
-              minWidth={column.minWidth ? column.minWidth : null}
             >
               {column.name}
             </TableColumn>

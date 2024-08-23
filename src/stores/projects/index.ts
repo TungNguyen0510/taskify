@@ -14,6 +14,9 @@ type Actions = {
   fetchCurrentProject: (projectId: string) => void;
   updateCurrentProject: (projectId: string, data: any) => void;
   createNewProject: (newProject: any) => void;
+  removeProjectMember: (memberId: number) => void;
+  updateProjectMember: (memberId: number, data: any) => void;
+  addProjectMember: (newMember: any) => void;
   reset: () => void;
 };
 
@@ -80,6 +83,21 @@ export const useProjectsStore = create<State & Actions>()(
               pos: 3,
             },
           ]);
+        },
+
+        addProjectMember: async (newMember: any) => {
+          await api.post<any>('/items/Project_directus_users', newMember);
+        },
+
+        updateProjectMember: async (memberId: number, data: any) => {
+          await api.patch<any>(
+            `/items/Project_directus_users/${memberId}`,
+            data,
+          );
+        },
+
+        removeProjectMember: async (memberId: number) => {
+          await api.delete(`/items/Project_directus_users/${memberId}`);
         },
 
         reset: () => {

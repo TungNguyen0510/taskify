@@ -31,7 +31,7 @@ function AvatarUser(props: AvatarUserProps) {
       <div>
         {currentUser?.first_name && currentUser?.first_name
           ? `${currentUser?.first_name} ${currentUser?.last_name}`
-          : 'None'}
+          : '-- --'}
       </div>
     </div>
   );

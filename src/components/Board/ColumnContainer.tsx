@@ -16,7 +16,8 @@ import TaskCard from '@/components/Board/TaskCard';
 import Icon from '@/components/Icon';
 import ConfirmModal from '@/components/Modal/ConfirmModal';
 import useClickOutside from '@/hooks/useClickOutside';
-import type { Column, Task } from '@/types/board';
+import type { Column } from '@/types/board';
+import type { Task } from '@/types/task';
 
 interface ColumnContainerProps {
   column: Column;

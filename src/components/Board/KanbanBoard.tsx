@@ -214,6 +214,16 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         theme: 'colored',
       });
     } catch (error) {
+      toast.error('Failed to delete task!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
       throw new Error('Failed to delete task');
     }
   };

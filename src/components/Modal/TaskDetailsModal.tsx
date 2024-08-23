@@ -446,9 +446,9 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                             size="sm"
                             hideTimeZone
                             showMonthAndYearPickers
-                            value={newDueDate}
+                            // value={newDueDate}
                             onChange={async (date) => {
-                              console.log('date', date.toString());
+                              // console.log('date', date.toString());
                               setNewDueDate(date.toString());
 
                               await updateTaskDetails(taskId, {

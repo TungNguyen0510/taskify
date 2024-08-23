@@ -75,6 +75,11 @@ function ProjectSettingsDetail({ params }: { params: { projectId: string } }) {
   return (
     <div className="flex w-full items-center justify-center">
       <div className="flex w-[400px] flex-col justify-center gap-4">
+        <p className="text-xs text-zinc-700">
+          Required fields are marked with an asterisk{' '}
+          <span className="text-base text-danger">*</span>
+        </p>
+
         <div>
           <Input
             isRequired
