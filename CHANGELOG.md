@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/TungNguyen0510/taskify/compare/v1.7.0...v1.8.0) (2024-08-23)
+
+
+### Features
+
+* add suspense ([1f042fe](https://github.com/TungNguyen0510/taskify/commit/1f042fec80057ed9e4c86d3c0292536dfb842c44))
+
 # [1.7.0](https://github.com/TungNguyen0510/taskify/compare/v1.6.0...v1.7.0) (2024-08-23)
 
 
