@@ -21,10 +21,12 @@ import { toast } from 'react-toastify';
 
 import { useProjectsStore } from '@/stores/projects';
 import { useUsersStore } from '@/stores/users';
+import { type Role } from '@/types/role';
 import { capitalize } from '@/utils/Helpers';
 
 import AvatarUser from '../AvatarUser';
 import Icon from '../Icon';
+import AddMemberModal from '../Modal/AddMemberModal';
 import ConfirmModal from '../Modal/ConfirmModal';
 
 const columns = [
@@ -83,6 +85,7 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
     });
 
   const [isConfirmRemoveMember, setIsConfirmRemoveMember] = useState(false);
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [currentMemberName, setCurrentMemberName] = useState('');
   const [memberIdToRemove, setMemberIdToRemove] = useState<number>(-1);
 
@@ -91,6 +94,15 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
     new Set(['OWNER', 'ADMIN', 'MEMBER']),
   );
 
+  const getDisabledKeys = (role: Role): string[] => {
+    if (role === 'OWNER') {
+      return ['ADMIN', 'MEMBER'];
+    }
+    if (role === 'ADMIN' || role === 'MEMBER') {
+      return ['OWNER'];
+    }
+    return [];
+  };
   const onClear = React.useCallback(() => {
     setFilterValue('');
   }, []);
@@ -205,9 +217,9 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
           <div className="flex items-center justify-center">
             <Select
               className="w-28"
-              disabledKeys={
-                member.role === 'OWNER' ? ['OWNER', 'ADMIN', 'MEMBER'] : []
-              }
+              selectionMode="single"
+              disallowEmptySelection
+              disabledKeys={getDisabledKeys(member.role)}
               defaultSelectedKeys={[member.role]}
               onChange={(e: any) => {
                 updateRoleMember(member.id, e.target.value);
@@ -310,6 +322,7 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
             color="primary"
             variant="solid"
             endContent={<Icon name="plus" />}
+            onClick={() => setIsAddMemberModalOpen(true)}
           >
             Add new member
           </Button>
@@ -368,8 +381,12 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
           setIsConfirmRemoveMember(false);
         }}
       />
+
+      <AddMemberModal
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+      />
     </div>
   );
 }
-
 export default ProjectSettingsAccess;

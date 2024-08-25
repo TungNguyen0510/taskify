@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 
 import Icon from '@/components/Icon';
 import { useProjectsStore } from '@/stores/projects';
+import { getUserRole } from '@/utils/Helpers';
 
 const tabs = [
   {
@@ -62,6 +63,8 @@ const ProjectLayout = (props: {
     }
   }, [currentProject, userId]);
 
+  const currentRole = getUserRole(currentProject?.project_members, userId);
+
   return (
     <div className="flex">
       <div className="min-h-[calc(100vh-56px)] w-64 min-w-64 border-r-2 bg-white">
@@ -81,7 +84,7 @@ const ProjectLayout = (props: {
           </div>
         ))}
 
-        {session.data?.user.id === currentProject?.owner ? (
+        {currentRole === 'OWNER' || currentRole === 'ADMIN' ? (
           <div className="mt-20">
             <Divider className="mx-4 my-2 w-[calc(100%-2rem)]" />
             <div className="flex h-12 items-center px-4">

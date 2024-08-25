@@ -20,24 +20,31 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import { Button, Input, ScrollShadow, Spinner } from '@nextui-org/react';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  ScrollShadow,
+  Spinner,
+} from '@nextui-org/react';
 import { notFound } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import ColumnContainer from '@/components/Board/ColumnContainer';
 import TaskCard from '@/components/Board/TaskCard';
 import Icon from '@/components/Icon';
-import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
 import { useUsersStore } from '@/stores/users';
-import type { NewActivity } from '@/types/activity';
 import type { Column, NewColumn } from '@/types/board';
 import type { NewTask, Task } from '@/types/task';
-import { generateUUID, resetAllStores } from '@/utils/Helpers';
+import { capitalize, resetAllStores } from '@/utils/Helpers';
 
 function KanbanBoard({ params }: { params: { projectId: string } }) {
   const session = useSession();
@@ -59,10 +66,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   } = useTasksStore();
   const { currentProject, fetchCurrentProject, updateCurrentProject } =
     useProjectsStore();
-  const { createNewActivity } = useActivitiesStore();
   const { fetchListUsers } = useUsersStore();
-
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -71,6 +75,66 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
   const [createColumnStatus, setCreateColumnStatus] = useState<string>('');
   const [isCreatingColumn, setIsCreatingColumn] = useState<boolean>(false);
+
+  const [filterValue, setFilterValue] = useState('');
+
+  const onSearchChange = useCallback((value: any) => {
+    if (value) {
+      setFilterValue(value);
+    } else {
+      setFilterValue('');
+    }
+  }, []);
+
+  const onClear = useCallback(() => {
+    setFilterValue('');
+  }, []);
+
+  const [statusFilter, setStatusFilter] = useState(
+    new Set(columns.map((item) => item.id)),
+  );
+
+  const statusOptions = columns.map((column) => ({
+    uid: column.id,
+    name: column.status,
+  }));
+
+  useEffect(() => {
+    setStatusFilter(new Set(columns.map((item) => item.id)));
+  }, [columns]);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const filteredItems = useMemo(() => {
+    let filteredTasks = [...tasks];
+
+    if (hasSearchFilter) {
+      filteredTasks = filteredTasks.filter((task) =>
+        task.summary.toLowerCase().includes(filterValue.toLowerCase()),
+      );
+    }
+
+    filteredTasks = filteredTasks.filter((task) =>
+      Array.from(statusFilter).includes(task.column_id),
+    );
+
+    return filteredTasks;
+  }, [tasks, filterValue, statusFilter]);
+
+  const filteredColumns = useMemo(() => {
+    let filteredList = [...columns];
+
+    filteredList = filteredList.filter((col) =>
+      Array.from(statusFilter).includes(col.id),
+    );
+
+    return filteredList;
+  }, [columns, statusFilter]);
+
+  const columnsId = useMemo(
+    () => columns.map((col) => col.id),
+    [filteredColumns],
+  );
 
   useEffect(() => {
     const fetchData = async (projectId: string) => {
@@ -158,16 +222,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   const createTask = async (columnId: string, summary: string) => {
     if (!userId || currentProject === null) return;
 
-    const currentColumnTasks = tasks
+    const currentColumnTasks = filteredItems
       .filter((task) => task.column_id === columnId)
       .sort((a, b) => a.pos - b.pos);
 
     const lastPos = currentColumnTasks[currentColumnTasks.length - 1]?.pos ?? 0;
 
-    const taskId = generateUUID();
-
     const newTask: NewTask = {
-      id: taskId,
       reporter: userId,
       project_id: params.projectId,
       column_id: columnId,
@@ -176,18 +237,9 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       pos: lastPos + 1024,
     };
 
-    const newActivity: NewActivity = {
-      action_type: 'CREATED',
-      user_id: userId,
-      project_id: params.projectId,
-      resource_id: taskId,
-      timestamp: new Date().toISOString(),
-    };
-
     try {
       await createNewTask(newTask);
 
-      await createNewActivity(newActivity);
       await updateCurrentProject(params.projectId, {
         tasks_count: currentProject.tasks_count + 1,
       });
@@ -342,9 +394,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       // console.log('activeTaskIndex', activeTaskIndex);
       // console.log('overTaskIndex', overTaskIndex);
 
-      const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
+      const activeTaskIndex = filteredItems.findIndex(
+        (task) => task.id === activeId,
+      );
 
-      const overTaskIndex = tasks.findIndex((task) => task.id === overId);
+      const overTaskIndex = filteredItems.findIndex(
+        (task) => task.id === overId,
+      );
 
       try {
         // if (columnIdHasActiveTask === columnIdHasOverTask) {
@@ -365,13 +421,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         await Promise.all([
           updatePositionTask(
             activeId,
-            tasks[activeTaskIndex]!.column_id,
-            tasks[overTaskIndex]!.pos,
+            filteredItems[activeTaskIndex]!.column_id,
+            filteredItems[overTaskIndex]!.pos,
           ),
           updatePositionTask(
             overId,
-            tasks[overTaskIndex]!.column_id,
-            tasks[activeTaskIndex]!.pos,
+            filteredItems[overTaskIndex]!.column_id,
+            filteredItems[activeTaskIndex]!.pos,
           ),
 
           fetchListTasks(params.projectId),
@@ -384,10 +440,12 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     const isOverAColumn = over.data.current?.type === 'Column';
 
     if (isActiveATask && isOverAColumn) {
-      const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
+      const activeTaskIndex = filteredItems.findIndex(
+        (task) => task.id === activeId,
+      );
 
       try {
-        if (tasks[activeTaskIndex]) {
+        if (filteredItems[activeTaskIndex]) {
           // caculate new pos
 
           await Promise.all([
@@ -415,12 +473,51 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
   return (
     <>
-      <div className="h-20 px-4">
+      <div className="flex flex-col gap-2 px-4 pb-2">
         {currentProject && (
           <div className="text-xl font-semibold">
             {currentProject.name} Board
           </div>
         )}
+
+        <div className="flex items-end justify-between gap-3">
+          <Input
+            className="w-full sm:max-w-[34%]"
+            placeholder="Search by summary..."
+            startContent={<Icon name="search" />}
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<Icon name="ChevronDownIcon" />}
+                  variant="flat"
+                >
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={(keys: 'all' | Set<React.Key>) =>
+                  setStatusFilter(keys as any)
+                }
+              >
+                {statusOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
+        </div>
       </div>
       <ScrollShadow
         orientation="horizontal"
@@ -435,13 +532,13 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         >
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
-              {columns
+              {filteredColumns
                 .sort((a, b) => a.pos - b.pos)
                 .map((col) => (
                   <ColumnContainer
                     column={col}
                     key={col.id}
-                    tasks={tasks
+                    tasks={filteredItems
                       .filter((task) => task.column_id === col.id)
                       .sort((a, b) => a.pos - b.pos)}
                     deleteColumn={deleteCurrentColumn}
@@ -517,7 +614,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
               {activeColumn && (
                 <ColumnContainer
                   column={activeColumn}
-                  tasks={tasks
+                  tasks={filteredItems
                     .filter((task) => task.column_id === activeColumn.id)
                     .sort((a, b) => a.pos - b.pos)}
                   deleteColumn={deleteCurrentColumn}

@@ -16,7 +16,6 @@ export type Task = {
 };
 
 export type NewTask = {
-  id: string;
   project_id: string;
   column_id: string;
   reporter: string;

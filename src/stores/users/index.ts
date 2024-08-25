@@ -8,7 +8,7 @@ type State = {
 };
 
 type Actions = {
-  fetchListUsers: () => void;
+  fetchListUsers: () => Promise<any[]>;
   reset: () => void;
 };
 
@@ -24,9 +24,12 @@ export const useUsersStore = create<State & Actions>()(
           const response = await api.get<any>(`/users`, {
             params: {
               fields: '*,avatar.*',
+              sort: ['email'],
             },
           });
           set({ users: response.data.data });
+
+          return response.data.data;
         },
 
         reset: () => {

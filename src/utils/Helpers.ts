@@ -5,6 +5,7 @@ import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
 import { useUsersStore } from '@/stores/users';
+import type { ProjectMember } from '@/types/project';
 
 export const getBaseUrl = () => {
   if (process.env.NEXT_PUBLIC_APP_URL) {
@@ -92,4 +93,12 @@ export function capitalize(str: string) {
 
 export function generateUUID(): string {
   return uuidv4();
+}
+
+export function getUserRole(
+  members: ProjectMember[] | undefined,
+  userId: string | undefined,
+): string | undefined {
+  const member = members?.find((m) => m.directus_users_id === userId);
+  return member ? member.project_role : undefined;
 }

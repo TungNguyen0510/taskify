@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unescaped-entities */
 
 'use client';
@@ -28,6 +29,11 @@ function YourWorkPage() {
     }
   }, []);
 
+  const ownedProjects = projects.filter((project) => project.owner === userId);
+  const notOwnedProjects = projects.filter(
+    (project) => project.owner !== userId,
+  );
+
   return (
     <>
       <div className="min-h-[calc(100vh-56px)] p-6">
@@ -46,17 +52,38 @@ function YourWorkPage() {
             </div>
 
             <Divider />
-            {projects.length > 0 ? (
-              <div className="scrollbar-1 flex gap-4 overflow-x-auto p-6">
-                {projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex h-full min-h-40 items-center justify-center">
-                You don't have any projects yet.
-              </div>
-            )}
+
+            <div>
+              {ownedProjects.length > 0 ? (
+                <div className="scrollbar-1 flex gap-4 overflow-x-auto p-6">
+                  {ownedProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-full min-h-20 items-center justify-center">
+                  You don't have any projects yet.
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="pb-4 text-2xl font-semibold">Other projects</div>
+            </div>
+            <Divider />
+            <div>
+              {notOwnedProjects.length > 0 ? (
+                <div className="scrollbar-1 flex gap-4 overflow-x-auto p-6">
+                  {notOwnedProjects.map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-full min-h-20 items-center justify-center">
+                  You are not invited to any project.
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

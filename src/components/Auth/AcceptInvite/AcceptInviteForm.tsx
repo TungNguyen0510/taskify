@@ -90,8 +90,6 @@ export default function AcceptInviteForm() {
       progress: undefined,
       theme: 'colored',
     });
-
-    setIsSuccess(false);
   };
 
   return (

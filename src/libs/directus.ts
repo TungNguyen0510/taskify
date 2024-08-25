@@ -108,7 +108,7 @@ export const acceptInvite = async ({
   password: string;
   token: string;
 }) => {
-  const res = await fetch(`${AppConfig.backendURL}/users/invisponse/accept`, {
+  const res = await fetch(`${AppConfig.backendURL}/users/invite/accept`, {
     method: 'POST',
     body: JSON.stringify({
       password,

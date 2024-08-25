@@ -21,7 +21,7 @@ import {
   TableRow,
   Tooltip,
 } from '@nextui-org/react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import Icon from '@/components/Icon';
@@ -146,12 +146,12 @@ export default function ListTasks({
     color: getStatusColor(column),
   }));
 
-  const [filterValue, setFilterValue] = React.useState('');
+  const [filterValue, setFilterValue] = useState('');
   // const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(
+  const [visibleColumns, setVisibleColumns] = useState(
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
-  const [statusFilter, setStatusFilter] = React.useState(
+  const [statusFilter, setStatusFilter] = useState(
     new Set(columns.map((item) => item.id)),
   );
 
@@ -159,22 +159,22 @@ export default function ListTasks({
     setStatusFilter(new Set(columns.map((item) => item.id)));
   }, [columns]);
 
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [sortDescriptor, setSortDescriptor] = React.useState({
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sortDescriptor, setSortDescriptor] = useState({
     column: 'key',
     direction: 'descending',
   });
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = React.useMemo(() => {
+  const headerColumns = useMemo(() => {
     if (visibleColumns.size === headers.length) return headers;
 
     return headers.filter((column) => visibleColumns.has(column.uid));
   }, [visibleColumns, headers]);
 
-  const filteredItems = React.useMemo(() => {
+  const filteredItems = useMemo(() => {
     let filteredTasks = [...tasks];
 
     if (hasSearchFilter) {
@@ -192,14 +192,14 @@ export default function ListTasks({
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-  const items = React.useMemo(() => {
+  const items = useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = React.useMemo(() => {
+  const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => {
       const first = a[sortDescriptor.column as keyof Task];
       const second = b[sortDescriptor.column as keyof Task];
@@ -218,7 +218,7 @@ export default function ListTasks({
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((task: any, columnKey: any) => {
+  const renderCell = useCallback((task: any, columnKey: any) => {
     const cellValue = task[columnKey];
 
     switch (columnKey) {
@@ -352,24 +352,24 @@ export default function ListTasks({
     }
   }, []);
 
-  const onNextPage = React.useCallback(() => {
+  const onNextPage = useCallback(() => {
     if (page < pages) {
       setPage(page + 1);
     }
   }, [page, pages]);
 
-  const onPreviousPage = React.useCallback(() => {
+  const onPreviousPage = useCallback(() => {
     if (page > 1) {
       setPage(page - 1);
     }
   }, [page]);
 
-  const onRowsPerPageChange = React.useCallback((e: any) => {
+  const onRowsPerPageChange = useCallback((e: any) => {
     setRowsPerPage(Number(e.target.value));
     setPage(1);
   }, []);
 
-  const onSearchChange = React.useCallback((value: any) => {
+  const onSearchChange = useCallback((value: any) => {
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -378,12 +378,12 @@ export default function ListTasks({
     }
   }, []);
 
-  const onClear = React.useCallback(() => {
+  const onClear = useCallback(() => {
     setFilterValue('');
     setPage(1);
   }, []);
 
-  const topContent = React.useMemo(() => {
+  const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
@@ -481,7 +481,7 @@ export default function ListTasks({
     hasSearchFilter,
   ]);
 
-  const bottomContent = React.useMemo(() => {
+  const bottomContent = useMemo(() => {
     return (
       <div className="flex items-center justify-between p-2">
         {/* <span className="w-[30%] text-small text-default-400">
@@ -527,7 +527,7 @@ export default function ListTasks({
     onNextPage,
   ]);
 
-  const classNames = React.useMemo(
+  const classNames = useMemo(
     () => ({
       wrapper: [
         'max-h-[600px]',

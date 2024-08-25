@@ -63,7 +63,7 @@ export default function LoginForm() {
       setErrMsg('Email address or password is invalid');
       toast.error('Email address or password is invalid', {
         position: 'bottom-left',
-        autoClose: 2000,
+        autoClose: 1500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -80,7 +80,7 @@ export default function LoginForm() {
 
       toast.success('Login successful!', {
         position: 'bottom-left',
-        autoClose: 2000,
+        autoClose: 1500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -165,7 +165,7 @@ export default function LoginForm() {
           Login
         </Button>
         <p className="text-sm">
-          Don't have an account{' '}
+          Don't have an account?{' '}
           <Link href="/sign-up" className="text-sm text-blue-500 underline">
             Sign up now
           </Link>

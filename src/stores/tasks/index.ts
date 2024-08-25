@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 
+import type { NewActivity } from '@/types/activity';
 import type { NewTask, Task } from '@/types/task';
 import api from '@/utils/axiosInstance';
+
+import { useActivitiesStore } from '../activity';
 
 type State = {
   tasks: Task[];
@@ -23,6 +26,9 @@ const initialState: State = {
   tasks: [],
   taskDetails: null,
 };
+
+const { createNewActivity } = useActivitiesStore.getState();
+
 export const useTasksStore = create<State & Actions>()(
   devtools(
     persist(
@@ -43,7 +49,17 @@ export const useTasksStore = create<State & Actions>()(
         },
 
         createNewTask: async (newTask: NewTask) => {
-          await api.post<any>('/items/Task', newTask);
+          const response = await api.post<any>('/items/Task', newTask);
+
+          const newActivity: NewActivity = {
+            action_type: 'CREATED',
+            user_id: newTask.reporter,
+            project_id: newTask.project_id,
+            resource_id: response.data.data.id,
+            timestamp: new Date().toISOString(),
+          };
+
+          await createNewActivity(newActivity);
         },
 
         updatePositionTask: async (

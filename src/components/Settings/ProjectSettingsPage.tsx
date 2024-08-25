@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 'use client';
@@ -9,6 +10,7 @@ import { useEffect } from 'react';
 
 import { useProjectsStore } from '@/stores/projects';
 import { useUsersStore } from '@/stores/users';
+import { getUserRole } from '@/utils/Helpers';
 
 import ProjectSettingsAccess from './ProjectSettingsAccess';
 import ProjectSettingsDetail from './ProjectSettingsDetail';
@@ -20,17 +22,29 @@ function ProjectSettingsPage({ params }: { params: { projectId: string } }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchCurrentProject(params.projectId);
-      await fetchListUsers();
+      await Promise.all([
+        fetchListUsers(),
+        fetchCurrentProject(params.projectId),
+      ]);
     };
     fetchData();
   }, [params.projectId]);
 
   const session = useSession();
+  const userId = session?.data?.user.id;
 
-  if (session.data?.user.id !== currentProject?.owner) {
-    return notFound();
-  }
+  useEffect(() => {
+    if (currentProject) {
+      const currentRole = getUserRole(currentProject.project_members, userId);
+
+      if (
+        !currentRole ||
+        (currentRole !== 'OWNER' && currentRole !== 'ADMIN')
+      ) {
+        return notFound();
+      }
+    }
+  }, [currentProject, userId]);
 
   return (
     <div>
