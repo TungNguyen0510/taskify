@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/TungNguyen0510/taskify/compare/v1.9.0...v1.10.0) (2024-08-26)
+
+
+### Features
+
+* task details & task page ([191aeed](https://github.com/TungNguyen0510/taskify/commit/191aeed3fa3afd51e6ccc862fb03f1f741c56e91))
+
 # [1.9.0](https://github.com/TungNguyen0510/taskify/compare/v1.8.0...v1.9.0) (2024-08-25)
 
 
