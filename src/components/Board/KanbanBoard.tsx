@@ -530,7 +530,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           onDragEnd={onDragEnd}
           onDragOver={onDragOver}
         >
-          <div className="flex gap-4">
+          <div className="scrollbar-1 flex gap-4 overflow-y-auto pb-2">
             <SortableContext items={columnsId}>
               {filteredColumns
                 .sort((a, b) => a.pos - b.pos)

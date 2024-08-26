@@ -77,7 +77,7 @@ function ColumnContainer(props: ColumnContainerProps) {
 
   const style = {
     transition,
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
   };
 
   return (
@@ -86,7 +86,7 @@ function ColumnContainer(props: ColumnContainerProps) {
         ref={setNodeRef}
         style={style}
         shadow="sm"
-        className={`flex h-[450px] max-h-[calc(100vh-56px-80px-16px-16px)] w-[270px] min-w-[270px] flex-col gap-2 rounded-md bg-slate-50 ${
+        className={`flex min-h-[450px] w-[270px] min-w-[270px] flex-col gap-2 rounded-md bg-slate-50 ${
           isDragging ? 'border border-blue-500 opacity-30' : ''
         }`}
       >

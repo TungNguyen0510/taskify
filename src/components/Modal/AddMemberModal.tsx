@@ -177,8 +177,8 @@ function AddMemberModal(props: AddMemberModalProps) {
                   <div className="flex items-center gap-2">
                     <Avatar
                       name={
-                        user?.first_name && user?.first_name
-                          ? getInitialsName(user.first_name, user.first_name)
+                        user?.first_name && user?.last_name
+                          ? getInitialsName(user.first_name, user.last_name)
                           : ''
                       }
                       showFallback
@@ -191,7 +191,7 @@ function AddMemberModal(props: AddMemberModalProps) {
                     />
                     <div className="flex flex-col">
                       <span className="text-small">
-                        {user?.first_name && user?.first_name
+                        {user?.first_name && user?.last_name
                           ? `${user.first_name} ${user.last_name}`
                           : '-- --'}
                       </span>

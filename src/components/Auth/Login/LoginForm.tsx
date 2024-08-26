@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 
@@ -38,8 +38,8 @@ export default function LoginForm() {
 
   const {
     handleSubmit,
-    register,
     reset,
+    control,
     formState: { errors, isValid, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -99,14 +99,20 @@ export default function LoginForm() {
         <h1 className="pb-4 text-2xl font-semibold">Login</h1>
 
         <div className="w-full">
-          <Input
-            isRequired
-            type="email"
-            labelPlacement="outside"
-            variant="bordered"
-            label="Email"
-            placeholder="Enter your email"
-            {...register('email')}
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                isRequired
+                type="email"
+                labelPlacement="outside"
+                variant="bordered"
+                label="Email"
+                placeholder="Enter your email"
+              />
+            )}
           />
           {errors.email && (
             <p className="pl-2 text-xs text-danger">{errors.email.message}</p>
@@ -114,29 +120,36 @@ export default function LoginForm() {
         </div>
 
         <div className="w-full">
-          <Input
-            isRequired
-            label="Password"
-            variant="bordered"
-            labelPlacement="outside"
-            placeholder="Enter your password"
-            {...register('password')}
-            type={isVisible ? 'text' : 'password'}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={toggleVisibility}
-                aria-label="toggle password visibility"
-              >
-                {isVisible ? (
-                  <Icon name="eyeSlashFilled" />
-                ) : (
-                  <Icon name="eyeFilled" />
-                )}
-              </button>
-            }
+          <Controller
+            name="password"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                isRequired
+                label="Password"
+                variant="bordered"
+                labelPlacement="outside"
+                placeholder="Enter your password"
+                type={isVisible ? 'text' : 'password'}
+                endContent={
+                  <button
+                    className="focus:outline-none"
+                    type="button"
+                    onClick={toggleVisibility}
+                    aria-label="toggle password visibility"
+                  >
+                    {isVisible ? (
+                      <Icon name="eyeSlashFilled" />
+                    ) : (
+                      <Icon name="eyeFilled" />
+                    )}
+                  </button>
+                }
+              />
+            )}
           />
+
           {errors.password && (
             <p className="pl-2 text-xs text-danger">
               {errors.password.message}

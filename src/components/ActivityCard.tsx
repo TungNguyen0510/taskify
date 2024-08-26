@@ -7,12 +7,9 @@ import { AppConfig } from '@/utils/AppConfig';
 import { formatDateFull, getInitialsName } from '@/utils/Helpers';
 
 function ActivityCard({ activity }: { activity: Activity }) {
-  const { users, fetchListUsers } = useUsersStore();
+  const { users } = useUsersStore();
 
   const [currentUser, setCurrentUser] = useState<any | null | undefined>(null);
-  useEffect(() => {
-    fetchListUsers();
-  }, [fetchListUsers]);
 
   useEffect(() => {
     setCurrentUser(users.find((user: any) => user.id === activity.user_id));

@@ -57,7 +57,7 @@ const TaskCard = (props: TaskCardProps) => {
 
   const style = {
     transition,
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
   };
 
   return (
@@ -69,7 +69,7 @@ const TaskCard = (props: TaskCardProps) => {
         {...listeners}
         shadow="sm"
         isHoverable
-        className={`h-fit min-h-24 rounded-md ${
+        className={`flex min-h-24 rounded-md ${
           isDragging ? 'border border-blue-500 opacity-30' : ''
         }`}
       >

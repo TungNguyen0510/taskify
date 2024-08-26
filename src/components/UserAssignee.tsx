@@ -4,6 +4,8 @@ import { useUsersStore } from '@/stores/users';
 import { AppConfig } from '@/utils/AppConfig';
 import { getInitialsName } from '@/utils/Helpers';
 
+import AvatarUser from './AvatarUser';
+
 interface UserAssigneeProps {
   id: string;
 }
@@ -17,6 +19,7 @@ function UserAssignee(props: UserAssigneeProps) {
   return (
     <Tooltip
       showArrow
+      placement="bottom-start"
       color="foreground"
       radius="sm"
       content={
@@ -24,26 +27,13 @@ function UserAssignee(props: UserAssigneeProps) {
           <div className="flex items-center gap-2">
             <div>Assignee:</div>
             <div className="flex items-center gap-1">
-              <Avatar
-                as="button"
-                size="sm"
-                className="size-6 text-tiny transition-transform"
-                name={
-                  currentUser
-                    ? getInitialsName(
-                        currentUser?.first_name,
-                        currentUser?.last_name,
-                      )
-                    : ''
-                }
-                showFallback
-                src={
-                  `${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ??
-                  ''
-                }
-              />
+              <AvatarUser userId={currentUser?.id} isHiddenName />
               <div>
-                <div>{`${currentUser?.first_name} ${currentUser?.last_name}`}</div>
+                <div>
+                  {currentUser?.first_name && currentUser?.last_name
+                    ? `${currentUser?.first_name} ${currentUser?.last_name}`
+                    : '-- --'}
+                </div>
                 <div className="text-xs">{currentUser?.email}</div>
               </div>
             </div>
@@ -54,12 +44,10 @@ function UserAssignee(props: UserAssigneeProps) {
       }
     >
       <Avatar
-        as="button"
         size="sm"
-        className="transition-transform"
         name={
-          currentUser
-            ? getInitialsName(currentUser?.first_name, currentUser?.last_name)
+          currentUser?.first_name && currentUser?.last_name
+            ? getInitialsName(currentUser.first_name, currentUser.first_name)
             : ''
         }
         showFallback

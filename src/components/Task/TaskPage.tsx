@@ -1,4 +1,4 @@
-import 'md-editor-rt/lib/style.css';
+'use client';
 
 import {
   Autocomplete,
@@ -7,22 +7,15 @@ import {
   Button,
   DatePicker,
   Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader,
   Select,
   SelectItem,
   Spinner,
   Textarea,
-  Tooltip,
 } from '@nextui-org/react';
 import { MdEditor, MdPreview } from 'md-editor-rt';
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import ActivityCard from '@/components/ActivityCard';
 import useClickOutside from '@/hooks/useClickOutside';
 import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
@@ -38,20 +31,15 @@ import {
   isExpiredDate,
 } from '@/utils/Helpers';
 
+import ActivityCard from '../ActivityCard';
 import AvatarUser from '../AvatarUser';
 import Icon from '../Icon';
 
-interface TaskDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  taskId: string;
-}
-
-function TaskDetailsModal(props: TaskDetailsModalProps) {
-  const { isOpen, onClose, taskId } = props;
-
-  const route = useRouter();
-
+function TaskPage({
+  params,
+}: {
+  params: { projectId: string; taskId: string };
+}) {
   const session = useSession();
 
   const currentUser = session.data?.user;
@@ -72,13 +60,11 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
     };
 
-    if (isOpen) {
-      fetchData();
-    }
-  }, [fetchTaskDetails, isOpen, taskId]);
+    fetchData();
+  }, [fetchTaskDetails, params.taskId]);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -108,7 +94,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [editorId] = useState(`editor${taskId}`);
+  const [editorId] = useState(`editor${params.taskId}`);
 
   const editSummaryRef = useClickOutside(() => setIsEditSummary(false));
   const editDescriptionRef = useClickOutside(() => setIsEditDesciption(false));
@@ -138,12 +124,12 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
       };
 
       setIsLoading(true);
-      await updateTaskDetails(taskId, {
+      await updateTaskDetails(params.taskId, {
         summary: newSummary,
       });
 
       await createNewActivity(newActivity);
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
 
       await fetchListActivities(taskDetails.id);
 
@@ -165,11 +151,11 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
         timestamp: new Date().toISOString(),
       };
 
-      await updateTaskDetails(taskId, {
+      await updateTaskDetails(params.taskId, {
         description: newDescription,
       });
       await createNewActivity(newActivity);
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
 
       await fetchListActivities(taskDetails.id);
 
@@ -190,13 +176,13 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
         timestamp: new Date().toISOString(),
       };
 
-      await updateTaskDetails(taskId, {
+      await updateTaskDetails(params.taskId, {
         column_id: columnId,
       });
 
       await createNewActivity(newActivity);
 
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
 
       setIsEditDueDate(false);
 
@@ -217,13 +203,13 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
         timestamp: new Date().toISOString(),
       };
 
-      await updateTaskDetails(taskId, {
+      await updateTaskDetails(params.taskId, {
         due_date: date,
       });
 
       await createNewActivity(newActivity);
 
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
 
       setIsEditDueDate(false);
 
@@ -244,13 +230,13 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
         timestamp: new Date().toISOString(),
       };
 
-      await updateTaskDetails(taskId, {
+      await updateTaskDetails(params.taskId, {
         assignee,
       });
 
       await createNewActivity(newActivity);
 
-      await fetchTaskDetails(taskId);
+      await fetchTaskDetails(params.taskId);
 
       setIsEditAssignee(false);
       await fetchListActivities(taskDetails.id);
@@ -262,40 +248,19 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
   };
 
   return (
-    <Modal
-      size="full"
-      backdrop="opaque"
-      placement="center"
-      isOpen={isOpen}
-      onClose={onClose}
-    >
-      <ModalContent className="size-full max-h-[calc(100vh-2em)] max-w-[calc(100vw-2em)]">
-        <ModalHeader className="flex flex-col gap-1">
-          <div className="flex gap-1">
+    <div className="w-[calc(100vw-18.875em)] min-w-[calc(100vw-18.875em)] px-4">
+      <div className="size-full">
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-1 pb-4 pt-2">
             <div className="size-4">
               <Icon name="checkSquare" />
             </div>
-            <Tooltip
-              showArrow
-              color="foreground"
-              radius="sm"
-              content={`Go to Task ${projectKey}-${taskDetails?.key} Page`}
-            >
-              <div
-                className="cursor-pointer text-xs text-zinc-500"
-                aria-hidden="true"
-                onClick={() =>
-                  route.push(
-                    `/u/project/${currentProject?.id}/task/${taskDetails?.id}`,
-                  )
-                }
-              >
-                {projectKey}-{taskDetails?.key}
-              </div>
-            </Tooltip>
+            <div className="text-xs text-zinc-500">
+              {projectKey}-{taskDetails?.key}
+            </div>
           </div>
-        </ModalHeader>
-        <ModalBody>
+        </div>
+        <div>
           <div className="scrollbar-2 flex h-[calc(100vh-6em)] flex-col gap-4 overflow-y-auto md:flex-row">
             <div className="scrollbar-2 flex h-[calc(100vh-6em)] w-full flex-col gap-4 overflow-y-auto px-2 pb-6 md:w-3/5">
               <div className="w-full">
@@ -707,9 +672,10 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
               </div>
             </div>
           </div>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+        </div>
+      </div>
+    </div>
   );
 }
-export default TaskDetailsModal;
+
+export default TaskPage;

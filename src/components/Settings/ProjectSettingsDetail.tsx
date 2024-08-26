@@ -60,7 +60,7 @@ function ProjectSettingsDetail({ params }: { params: { projectId: string } }) {
 
     toast.success('Project settings updated successfully!', {
       position: 'bottom-left',
-      autoClose: 2000,
+      autoClose: 1500,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,

@@ -8,6 +8,7 @@ import {
   DropdownSection,
   DropdownTrigger,
 } from '@nextui-org/react';
+import { useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { useLayoutEffect } from 'react';
 
@@ -15,6 +16,7 @@ import { useUsersStore } from '@/stores/users';
 import { AppConfig } from '@/utils/AppConfig';
 
 function UserArea() {
+  const route = useRouter();
   const session = useSession();
 
   const user = session.data?.user;
@@ -55,10 +57,18 @@ function UserArea() {
         </DropdownSection>
 
         <DropdownSection aria-label="Settings" showDivider>
-          <DropdownItem key="settings">My Settings</DropdownItem>
-          <DropdownItem key="team_settings">Team Settings</DropdownItem>
-          <DropdownItem key="analytics">Analytics</DropdownItem>
-          <DropdownItem key="system">System</DropdownItem>
+          <DropdownItem
+            key="my_profile"
+            onClick={() => route.push('/u/profile')}
+          >
+            My Profile
+          </DropdownItem>
+          <DropdownItem
+            key="my_works"
+            onClick={() => route.push('/u/your-work')}
+          >
+            My works
+          </DropdownItem>
         </DropdownSection>
 
         <DropdownItem

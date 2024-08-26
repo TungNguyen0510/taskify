@@ -30,6 +30,12 @@ export default function AppLayout(props: { children: React.ReactNode }) {
           >
             Your work
           </Link>
+          <Link
+            href="/u/profile"
+            className="font-semibold text-black hover:text-blue-500"
+          >
+            Profile
+          </Link>
         </>
       }
       rightNav={<UserArea />}

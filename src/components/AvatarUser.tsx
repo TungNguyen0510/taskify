@@ -6,10 +6,11 @@ import { getInitialsName } from '@/utils/Helpers';
 
 interface AvatarUserProps {
   userId: string;
+  isHiddenName?: boolean;
 }
 
 function AvatarUser(props: AvatarUserProps) {
-  const { userId } = props;
+  const { userId, isHiddenName = false } = props;
 
   const { users } = useUsersStore();
 
@@ -20,7 +21,7 @@ function AvatarUser(props: AvatarUserProps) {
       <Avatar
         size="sm"
         name={
-          currentUser?.first_name && currentUser?.first_name
+          currentUser?.first_name && currentUser?.last_name
             ? getInitialsName(currentUser.first_name, currentUser.first_name)
             : ''
         }
@@ -28,11 +29,13 @@ function AvatarUser(props: AvatarUserProps) {
         src={`${AppConfig.backendURL}/assets/${currentUser?.avatar?.id}` ?? ''}
       />
 
-      <div>
-        {currentUser?.first_name && currentUser?.first_name
-          ? `${currentUser?.first_name} ${currentUser?.last_name}`
-          : '-- --'}
-      </div>
+      {!isHiddenName && (
+        <div>
+          {currentUser?.first_name && currentUser?.last_name
+            ? `${currentUser?.first_name} ${currentUser?.last_name}`
+            : '-- --'}
+        </div>
+      )}
     </div>
   );
 }

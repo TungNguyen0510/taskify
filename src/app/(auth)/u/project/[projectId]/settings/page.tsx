@@ -6,7 +6,7 @@ export async function generateMetadata() {
   };
 }
 
-export default function ListPage({
+export default function SettingPage({
   params,
 }: {
   params: { projectId: string };

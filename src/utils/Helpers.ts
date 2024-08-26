@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { DateTime } from 'luxon';
 
 import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
@@ -81,8 +81,8 @@ export function isExpiredDate(expirationTime: string | Date): boolean {
 }
 
 export function getInitialsName(first_name: string, last_name: string) {
-  const firstInitial = first_name.charAt(0).toUpperCase();
-  const lastInitial = last_name.charAt(0).toUpperCase();
+  const firstInitial = first_name?.charAt(0).toUpperCase();
+  const lastInitial = last_name?.charAt(0).toUpperCase();
 
   return `${firstInitial}${lastInitial}`;
 }
@@ -91,14 +91,65 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function generateUUID(): string {
-  return uuidv4();
-}
-
 export function getUserRole(
   members: ProjectMember[] | undefined,
   userId: string | undefined,
 ): string | undefined {
   const member = members?.find((m) => m.directus_users_id === userId);
   return member ? member.project_role : undefined;
+}
+
+interface TimeData {
+  calendar: { identifier: string };
+  era: string;
+  year: number;
+  month: number;
+  day: number;
+  timeZone: string;
+  offset: number;
+  hour: number;
+  minute: number;
+  second: number;
+  millisecond: number;
+}
+
+export function convertToISO(timeData: TimeData): string {
+  const { year, month, day, hour, minute, second, millisecond, timeZone } =
+    timeData;
+
+  const localDate = DateTime.fromObject(
+    {
+      year,
+      month,
+      day,
+      hour,
+      minute,
+      second,
+      millisecond,
+    },
+    { zone: timeZone },
+  );
+
+  const isoString = localDate.toISO();
+  return isoString !== null ? isoString : '';
+}
+
+export function convertFromISO(isoString: string) {
+  const dateTime = DateTime.fromISO(isoString, { setZone: true });
+
+  return {
+    calendar: {
+      identifier: 'gregory',
+    },
+    era: 'AD',
+    year: dateTime.year,
+    month: dateTime.month,
+    day: dateTime.day,
+    timeZone: dateTime.zoneName,
+    offset: dateTime.offset * 60 * 1000,
+    hour: dateTime.hour,
+    minute: dateTime.minute,
+    second: dateTime.second,
+    millisecond: dateTime.millisecond,
+  };
 }
