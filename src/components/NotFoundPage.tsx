@@ -16,7 +16,7 @@ function NotFoundPage() {
           Page not found
         </p>
         <p className="text-lg text-zinc-500">
-          Sorry, the page you are looking for could not be found
+          Sorry, the page you are looking for could not be found.
         </p>
 
         <div className="mt-6 flex gap-4">

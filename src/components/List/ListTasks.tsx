@@ -40,6 +40,7 @@ import {
 
 import AvatarUser from '../AvatarUser';
 import ConfirmModal from '../Modal/ConfirmModal';
+import CreateTaskModal from '../Modal/CreateTaskModal';
 import TaskDetailsModal from '../Modal/TaskDetailsModal';
 import StatusChip from '../StatusChip';
 
@@ -81,6 +82,9 @@ export default function ListTasks({
     useState<boolean>(false);
 
   const [isOpenTaskDetailsModal, setIsOpenTaskDetailsModal] =
+    useState<boolean>(false);
+
+  const [isOpenCreateTaskModal, setIsOpenCreateTaskModal] =
     useState<boolean>(false);
 
   const [currentTaskId, setCurrentTaskId] = useState<string>('');
@@ -448,7 +452,11 @@ export default function ListTasks({
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<Icon name="plus" />}>
+            <Button
+              color="primary"
+              endContent={<Icon name="plus" />}
+              onClick={() => setIsOpenCreateTaskModal(true)}
+            >
               Add New Task
             </Button>
           </div>
@@ -616,6 +624,15 @@ export default function ListTasks({
         isOpen={isOpenTaskDetailsModal}
         onClose={() => setIsOpenTaskDetailsModal(false)}
         taskId={currentTaskId}
+      />
+
+      <CreateTaskModal
+        isOpen={isOpenCreateTaskModal}
+        onClose={() => {
+          setIsOpenCreateTaskModal(false);
+          fetchListTasks(params.projectId);
+        }}
+        projectId={params.projectId}
       />
     </>
   );

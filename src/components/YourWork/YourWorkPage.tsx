@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 import { useProjectsStore } from '@/stores/projects';
+import { useUsersStore } from '@/stores/users';
 import { resetAllStores } from '@/utils/Helpers';
 
 import CreateProjectModal from '../Modal/CreateProjectModal';
@@ -20,6 +21,8 @@ function YourWorkPage() {
 
   const { projects, fetchListProjects } = useProjectsStore();
 
+  const { fetchListUsers } = useUsersStore();
+
   const [isCreatingProject, setIsCreatingProject] = useState(false);
 
   useEffect(() => {
@@ -27,6 +30,7 @@ function YourWorkPage() {
     if (userId) {
       fetchListProjects(userId);
     }
+    fetchListUsers();
   }, []);
 
   const ownedProjects = projects.filter((project) => project.owner === userId);

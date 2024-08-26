@@ -15,6 +15,7 @@ import {
 import { MdEditor, MdPreview } from 'md-editor-rt';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import useClickOutside from '@/hooks/useClickOutside';
 import { useActivitiesStore } from '@/stores/activity';
@@ -56,15 +57,16 @@ function TaskPage({
 
   const projectKey = currentProject?.key;
 
-  const { columns } = useColumnsStore();
+  const { columns, fetchListColumns } = useColumnsStore();
 
   useEffect(() => {
     const fetchData = async () => {
       await fetchTaskDetails(params.taskId);
+      await fetchListColumns(params.projectId);
     };
 
     fetchData();
-  }, [fetchTaskDetails, params.taskId]);
+  }, [fetchTaskDetails, fetchListColumns, params.taskId, params.projectId]);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -128,6 +130,17 @@ function TaskPage({
         summary: newSummary,
       });
 
+      toast.success('Update task summary successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
       await createNewActivity(newActivity);
       await fetchTaskDetails(params.taskId);
 
@@ -154,6 +167,18 @@ function TaskPage({
       await updateTaskDetails(params.taskId, {
         description: newDescription,
       });
+
+      toast.success('Update task description successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
       await createNewActivity(newActivity);
       await fetchTaskDetails(params.taskId);
 
@@ -178,6 +203,17 @@ function TaskPage({
 
       await updateTaskDetails(params.taskId, {
         column_id: columnId,
+      });
+
+      toast.success('Update task status successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
       });
 
       await createNewActivity(newActivity);
@@ -207,6 +243,17 @@ function TaskPage({
         due_date: date,
       });
 
+      toast.success('Update task due date successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
       await createNewActivity(newActivity);
 
       await fetchTaskDetails(params.taskId);
@@ -232,6 +279,17 @@ function TaskPage({
 
       await updateTaskDetails(params.taskId, {
         assignee,
+      });
+
+      toast.success('Update task assignee successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
       });
 
       await createNewActivity(newActivity);
