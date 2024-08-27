@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/TungNguyen0510/taskify/compare/v1.11.0...v1.12.0) (2024-08-27)
+
+
+### Features
+
+* dashboard page ([0918d79](https://github.com/TungNguyen0510/taskify/commit/0918d7920b217995fc7eb2e1bb5901e61d8f6657))
+
 # [1.11.0](https://github.com/TungNguyen0510/taskify/compare/v1.10.0...v1.11.0) (2024-08-26)
 
 
