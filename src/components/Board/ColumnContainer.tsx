@@ -8,6 +8,8 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Select,
+  SelectItem,
   Spinner,
 } from '@nextui-org/react';
 import { useMemo, useState } from 'react';
@@ -16,6 +18,8 @@ import TaskCard from '@/components/Board/TaskCard';
 import Icon from '@/components/Icon';
 import ConfirmModal from '@/components/Modal/ConfirmModal';
 import useClickOutside from '@/hooks/useClickOutside';
+import { useColumnsStore } from '@/stores/columns';
+import { useTasksStore } from '@/stores/tasks';
 import type { Column } from '@/types/board';
 import type { Task } from '@/types/task';
 
@@ -38,6 +42,9 @@ function ColumnContainer(props: ColumnContainerProps) {
     deleteTask,
   } = props;
 
+  const { columns } = useColumnsStore();
+  const { updateTaskDetails } = useTasksStore();
+
   const [editMode, setEditMode] = useState(false);
   const [isConfirmDeleteColumn, setIsConfirmDeleteColumn] =
     useState<boolean>(false);
@@ -55,6 +62,31 @@ function ColumnContainer(props: ColumnContainerProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
+
+  const formattedColumns = columns
+    .filter((col) => col.id !== column.id)
+    .map((col) => ({
+      id: col.id,
+      label: col.status,
+    }));
+
+  const todoColumnId = columns.find((col) => col.isTodo === true)?.id;
+
+  const [columnIdToTranfer, setColumnIdToTranfer] = useState<string>(
+    todoColumnId as string,
+  );
+
+  const tranferTasks = () => {
+    try {
+      tasks.forEach(async (task) => {
+        await updateTaskDetails(task.id, {
+          column_id: columnIdToTranfer,
+        });
+      });
+    } catch (e) {
+      throw new Error('Failed to tranfer tasks');
+    }
+  };
 
   const {
     setNodeRef,
@@ -273,15 +305,36 @@ function ColumnContainer(props: ColumnContainerProps) {
       </Card>
 
       <ConfirmModal
+        size="2xl"
         backdrop="opaque"
         modalPlacement="top-center"
         comfirmTitle="Confirm delete column"
         comfirmMessage="Are you sure you want to delete this column?"
         okTitle="Delete"
+        contentSlot={
+          <div className="flex items-center gap-2">
+            <p>All tasks in this column will be transferred to the column:</p>
+
+            <Select
+              className="w-48"
+              selectionMode="single"
+              disallowEmptySelection
+              defaultSelectedKeys={[todoColumnId as string]}
+              onChange={(e: any) => {
+                setColumnIdToTranfer(e.target.value);
+              }}
+            >
+              {formattedColumns.map((col) => (
+                <SelectItem key={col.id}>{col.label}</SelectItem>
+              ))}
+            </Select>
+          </div>
+        }
         isOpen={isConfirmDeleteColumn}
         onClose={() => setIsConfirmDeleteColumn(false)}
         onConfirm={() => {
           deleteColumn(column.id);
+          tranferTasks();
           setIsConfirmDeleteColumn(false);
         }}
       />

@@ -62,6 +62,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     fetchListTasks,
     createNewTask,
     updatePositionTask,
+    updateTaskDetails,
     deleteTask,
   } = useTasksStore();
   const { currentProject, fetchCurrentProject, updateCurrentProject } =
@@ -77,6 +78,8 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   const [isCreatingColumn, setIsCreatingColumn] = useState<boolean>(false);
 
   const [filterValue, setFilterValue] = useState('');
+
+  const doneColumnId = columns.find((col) => col.isDone === true)?.id;
 
   const onSearchChange = useCallback((value: any) => {
     if (value) {
@@ -107,6 +110,8 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
 
   const filteredItems = useMemo(() => {
     let filteredTasks = [...tasks];
+
+    filteredTasks = filteredTasks.filter((task) => task.isBacklog !== true);
 
     if (hasSearchFilter) {
       filteredTasks = filteredTasks.filter((task) =>
@@ -197,8 +202,6 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       setIsLoading(false);
       throw new Error('Failed to delete column');
     }
-
-    // need tranfer tasks to other column
   };
 
   const updateCurrentStatusColumn = async (
@@ -418,20 +421,24 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
         //   await fetchListTasks(params.projectId);
         // }
 
-        await Promise.all([
-          updatePositionTask(
-            activeId,
-            filteredItems[activeTaskIndex]!.column_id,
-            filteredItems[overTaskIndex]!.pos,
-          ),
-          updatePositionTask(
-            overId,
-            filteredItems[overTaskIndex]!.column_id,
-            filteredItems[activeTaskIndex]!.pos,
-          ),
+        await updatePositionTask(
+          activeId,
+          filteredItems[activeTaskIndex]!.column_id,
+          // filteredItems[overTaskIndex]!.pos,
+        );
+        await updatePositionTask(
+          overId,
+          filteredItems[overTaskIndex]!.column_id,
+          // filteredItems[activeTaskIndex]!.pos,
+        );
 
-          fetchListTasks(params.projectId),
-        ]);
+        if (filteredItems[overTaskIndex]!.column_id === doneColumnId) {
+          await updateTaskDetails(filteredItems[activeTaskIndex]!.column_id, {
+            isDone: true,
+          });
+
+          await fetchListTasks(params.projectId);
+        }
       } catch (e) {
         throw new Error('Failed to update position task');
       }
@@ -530,7 +537,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
           onDragEnd={onDragEnd}
           onDragOver={onDragOver}
         >
-          <div className="scrollbar-1 flex gap-4 overflow-y-auto pb-2">
+          <div className="scrollbar-1 flex gap-4 overflow-y-auto px-1 pb-2">
             <SortableContext items={columnsId}>
               {filteredColumns
                 .sort((a, b) => a.pos - b.pos)

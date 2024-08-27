@@ -14,6 +14,7 @@ export type Task = {
   assignee: string;
   reporter: string;
   isDone: boolean;
+  isBacklog: boolean;
 };
 
 export type NewTask = {

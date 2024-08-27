@@ -205,6 +205,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   const updateTaskStatus = async (columnId: string) => {
     if (currentUser?.id && taskDetails) {
+      const doneColumnId = columns.find((column) => column.isDone === true)?.id;
       const newActivity: NewActivity = {
         action_type: 'UPDATED',
         field: 'Status',
@@ -217,6 +218,12 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
       await updateTaskDetails(taskId, {
         column_id: columnId,
       });
+
+      if (columnId === doneColumnId) {
+        await updateTaskDetails(taskId, {
+          isDone: true,
+        });
+      }
 
       toast.success('Update task status successfully!', {
         position: 'bottom-left',

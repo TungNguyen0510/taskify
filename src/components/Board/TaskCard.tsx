@@ -12,8 +12,10 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { useProjectsStore } from '@/stores/projects';
+import { useTasksStore } from '@/stores/tasks';
 import type { Task } from '@/types/task';
 import { formatDateFull, formatDateMD, isExpiredDate } from '@/utils/Helpers';
 
@@ -32,6 +34,8 @@ const TaskCard = (props: TaskCardProps) => {
 
   const { currentProject } = useProjectsStore();
 
+  const { updateTaskDetails, fetchListTasks } = useTasksStore();
+
   const projectKey = currentProject?.key;
 
   const [isConfirmDeleteTask, setIsConfirmDeleteTask] =
@@ -39,6 +43,43 @@ const TaskCard = (props: TaskCardProps) => {
 
   const [isOpenTaskDetailsModal, setIsOpenTaskDetailsModal] =
     useState<boolean>(false);
+
+  const [isOpenMoveToBacklogModal, setIsOpenMoveToBacklogModal] =
+    useState<boolean>(false);
+
+  const moveToBacklog = async (taskId: string) => {
+    try {
+      await updateTaskDetails(taskId, {
+        isBacklog: true,
+      });
+
+      await fetchListTasks(task.project_id);
+
+      toast.success('Move to backlog successful!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+    } catch (error) {
+      toast.error('Move to backlog failed!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
+      throw new Error('Failed to move to backlog');
+    }
+  };
 
   const {
     setNodeRef,
@@ -101,6 +142,14 @@ const TaskCard = (props: TaskCardProps) => {
                   Details
                 </DropdownItem>
                 <DropdownItem
+                  className="font-semibold"
+                  onClick={() => {
+                    setIsOpenMoveToBacklogModal(true);
+                  }}
+                >
+                  Move to Backlog
+                </DropdownItem>
+                <DropdownItem
                   onClick={() => setIsConfirmDeleteTask(true)}
                   className="font-semibold text-danger"
                   color="danger"
@@ -132,7 +181,9 @@ const TaskCard = (props: TaskCardProps) => {
             <div className="size-4">
               <Icon name="checkSquare" />
             </div>
-            <div className="text-xs text-zinc-500">
+            <div
+              className={`text-xs text-zinc-500 ${task.isDone ? 'text-zinc-300 line-through' : ''}`}
+            >
               {projectKey}-{task.key}
             </div>
           </div>
@@ -143,16 +194,32 @@ const TaskCard = (props: TaskCardProps) => {
       </Card>
 
       <ConfirmModal
+        size="2xl"
         backdrop="opaque"
         modalPlacement="top-center"
         comfirmTitle="Confirm delete task"
-        comfirmMessage="You're about to permanently delete this task, its comments and attachments, and all of its data. If you're not sure, you can resolve or close this task instead."
+        comfirmMessage="You're about to permanently delete this task, its descriptions and attachments, and all of its data. If you're not sure, you can resolve or close this task instead."
         okTitle="Delete"
         isOpen={isConfirmDeleteTask}
         onClose={() => setIsConfirmDeleteTask(false)}
         onConfirm={() => {
           deleteTask(task.id);
           setIsConfirmDeleteTask(false);
+        }}
+      />
+
+      <ConfirmModal
+        backdrop="opaque"
+        modalPlacement="top-center"
+        comfirmTitle="Confirm move to backlog"
+        comfirmMessage="Are you sure you want to move this task to the backlog?"
+        okTitle="Move"
+        okBtnColor="primary"
+        isOpen={isOpenMoveToBacklogModal}
+        onClose={() => setIsOpenMoveToBacklogModal(false)}
+        onConfirm={() => {
+          moveToBacklog(task.id);
+          setIsOpenMoveToBacklogModal(false);
         }}
       />
 

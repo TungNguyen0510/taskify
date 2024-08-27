@@ -49,10 +49,6 @@ const headers = [
   { name: 'SUMMARY', uid: 'summary', sortable: true },
   { name: 'STATUS', uid: 'column_id', sortable: true },
   { name: 'ASSIGNEE', uid: 'assignee' },
-  { name: 'DUE DATE', uid: 'due_date', sortable: true },
-  { name: 'DATE CREATED', uid: 'date_created', sortable: true },
-  { name: 'DATE UPDATED', uid: 'date_updated', sortable: true },
-  { name: 'REPORTER', uid: 'reporter', minWidth: '300px' },
   { name: 'ACTIONS', uid: 'actions' },
 ];
 
@@ -61,12 +57,10 @@ const INITIAL_VISIBLE_COLUMNS = [
   'summary',
   'column_id',
   'assignee',
-  'due_date',
-  'reporter',
   'actions',
 ];
 
-export default function ListTasks({
+export default function BacklogPage({
   params,
 }: {
   params: { projectId: string };
@@ -85,7 +79,7 @@ export default function ListTasks({
   const [isOpenTaskDetailsModal, setIsOpenTaskDetailsModal] =
     useState<boolean>(false);
 
-  const [isOpenAddToBacklogModal, setIsOpenAddToBacklogModal] =
+  const [isOpenMoveToBoardModal, setIsOpenMoveToBoardModal] =
     useState<boolean>(false);
 
   const [isOpenCreateTaskModal, setIsOpenCreateTaskModal] =
@@ -107,15 +101,15 @@ export default function ListTasks({
     fetchData();
   }, []);
 
-  const addToBacklog = async (taskId: string) => {
+  const moveToBoard = async (taskId: string) => {
     try {
       await updateTaskDetails(taskId, {
-        isBacklog: true,
+        isBacklog: false,
       });
 
       await fetchListTasks(params.projectId);
 
-      toast.success('Add to backlog successful!', {
+      toast.success('Move to board successful!', {
         position: 'bottom-left',
         autoClose: 1500,
         hideProgressBar: false,
@@ -126,7 +120,7 @@ export default function ListTasks({
         theme: 'colored',
       });
     } catch (error) {
-      toast.error('Add to backlog failed!', {
+      toast.error('Move to board failed!', {
         position: 'bottom-left',
         autoClose: 1500,
         hideProgressBar: false,
@@ -137,7 +131,7 @@ export default function ListTasks({
         theme: 'colored',
       });
 
-      throw new Error('Failed to add to backlog');
+      throw new Error('Failed to move to board');
     }
   };
 
@@ -190,7 +184,6 @@ export default function ListTasks({
 
   const [filterValue, setFilterValue] = useState('');
   // const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-
   const [visibleColumns, setVisibleColumns] = useState(
     new Set(INITIAL_VISIBLE_COLUMNS),
   );
@@ -219,6 +212,8 @@ export default function ListTasks({
 
   const filteredItems = useMemo(() => {
     let filteredTasks = [...tasks];
+
+    filteredTasks = filteredTasks.filter((task) => task.isBacklog === true);
 
     if (hasSearchFilter) {
       filteredTasks = filteredTasks.filter((task) =>
@@ -313,48 +308,6 @@ export default function ListTasks({
             )}
           </div>
         );
-      case 'date_created':
-        return (
-          <div>
-            {task.date_created ? (
-              <Tooltip
-                showArrow
-                color="foreground"
-                radius="sm"
-                content={`Date created: ${formatDateFull(task.date_created)}`}
-              >
-                <p className="w-fit rounded-md bg-zinc-200 px-2 py-1 font-semibold">
-                  {formatDateMDY(task.date_created)}
-                </p>
-              </Tooltip>
-            ) : (
-              <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
-                None
-              </div>
-            )}
-          </div>
-        );
-      case 'date_updated':
-        return (
-          <div>
-            {task.date_updated ? (
-              <Tooltip
-                showArrow
-                color="foreground"
-                radius="sm"
-                content={`Date updated: ${formatDateFull(task.date_updated)}`}
-              >
-                <p className="w-fit rounded-md bg-zinc-200 px-2 py-1 font-semibold">
-                  {formatDateMDY(task.date_updated)}
-                </p>
-              </Tooltip>
-            ) : (
-              <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
-                None
-              </div>
-            )}
-          </div>
-        );
       case 'column_id':
         return <StatusChip id={task.column_id} />;
       case 'actions':
@@ -379,11 +332,11 @@ export default function ListTasks({
                 <DropdownItem
                   className="font-semibold"
                   onClick={() => {
-                    setIsOpenAddToBacklogModal(true);
+                    setIsOpenMoveToBoardModal(true);
                     setCurrentTaskId(task.id);
                   }}
                 >
-                  Add to Backlog
+                  Move to Board
                 </DropdownItem>
                 <DropdownItem
                   className="font-semibold text-danger"
@@ -500,25 +453,12 @@ export default function ListTasks({
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button
-              color="primary"
-              endContent={<Icon name="plus" />}
-              onClick={() => setIsOpenCreateTaskModal(true)}
-            >
-              Add New Task
-            </Button>
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-small text-default-400">
-              Total {tasks.length} tasks
-            </span>
-
-            {/* {Array.from(selectedKeys).length > 0 ? (
-              <Button color="primary">Move tasks to Backlog</Button>
-            ) : null} */}
-          </div>
+          <span className="text-small text-default-400">
+            Total {filteredItems.length} tasks
+          </span>
           <label className="flex items-center text-small text-default-400">
             Rows per page:
             <select
@@ -615,12 +555,11 @@ export default function ListTasks({
   return (
     <>
       <div className="mb-4">
-        <div className="text-xl font-semibold">List</div>
+        <div className="text-xl font-semibold">Backlog</div>
       </div>
       <Table
         aria-label="List tasks"
         radius="none"
-        color="primary"
         isStriped
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
@@ -678,25 +617,25 @@ export default function ListTasks({
         }}
       />
 
-      <ConfirmModal
-        backdrop="opaque"
-        modalPlacement="top-center"
-        comfirmTitle="Confirm add to backlog"
-        comfirmMessage="Are you sure you want to add this task to the backlog?"
-        okTitle="Add"
-        okBtnColor="primary"
-        isOpen={isOpenAddToBacklogModal}
-        onClose={() => setIsOpenAddToBacklogModal(false)}
-        onConfirm={() => {
-          addToBacklog(currentTaskId);
-          setIsOpenAddToBacklogModal(false);
-        }}
-      />
-
       <TaskDetailsModal
         isOpen={isOpenTaskDetailsModal}
         onClose={() => setIsOpenTaskDetailsModal(false)}
         taskId={currentTaskId}
+      />
+
+      <ConfirmModal
+        backdrop="opaque"
+        modalPlacement="top-center"
+        comfirmTitle="Confirm move to board"
+        comfirmMessage="Are you sure you want to move this task to the board?"
+        okTitle="Move"
+        okBtnColor="primary"
+        isOpen={isOpenMoveToBoardModal}
+        onClose={() => setIsOpenMoveToBoardModal(false)}
+        onConfirm={() => {
+          moveToBoard(currentTaskId);
+          setIsOpenMoveToBoardModal(false);
+        }}
       />
 
       <CreateTaskModal

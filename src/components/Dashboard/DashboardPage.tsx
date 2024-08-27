@@ -131,6 +131,7 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
 
   const workloadStatusOptions = {
     animationEnabled: true,
+    exportEnabled: true,
     title: {
       text: '',
     },
@@ -159,7 +160,7 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
             <div className="font-semibold">Unassigned</div>
           </CardHeader>
           <CardBody>
-            <div className="scrollbar-1 flex min-w-[180px] flex-col items-center justify-center gap-2">
+            <div className="flex flex-col items-center justify-center gap-2">
               <div className="text-3xl font-semibold">
                 {countUnassignedTasks()}
               </div>
@@ -173,7 +174,7 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
             <div className="font-semibold">In progress</div>
           </CardHeader>
           <CardBody>
-            <div className="scrollbar-1 flex min-w-[180px] flex-col items-center justify-center gap-2">
+            <div className="flex flex-col items-center justify-center gap-2">
               <div className="text-3xl font-semibold">
                 {countInProgressTasks()}
               </div>
@@ -187,7 +188,7 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
             <div className="font-semibold">Completed</div>
           </CardHeader>
           <CardBody>
-            <div className="scrollbar-1 flex min-w-[180px] flex-col items-center justify-center gap-2">
+            <div className="flex flex-col items-center justify-center gap-2">
               <div className="text-3xl font-semibold">{countDoneTasks()}</div>
               <div>tasks completed</div>
             </div>

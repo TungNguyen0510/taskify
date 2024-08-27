@@ -8,6 +8,18 @@ import {
 } from '@nextui-org/react';
 
 interface ConfirmModalProps {
+  size?:
+    | 'md'
+    | 'xs'
+    | 'sm'
+    | 'lg'
+    | 'xl'
+    | '2xl'
+    | '3xl'
+    | '4xl'
+    | '5xl'
+    | 'full'
+    | undefined;
   comfirmTitle: string;
   comfirmMessage: string;
   okTitle: string;
@@ -37,12 +49,14 @@ interface ConfirmModalProps {
     | 'warning'
     | 'danger'
     | undefined;
+  contentSlot?: React.ReactNode;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 function ConfirmModal(props: ConfirmModalProps) {
   const {
+    size,
     comfirmTitle,
     comfirmMessage,
     okTitle,
@@ -51,12 +65,14 @@ function ConfirmModal(props: ConfirmModalProps) {
     isOpen,
     cancelBtnColor,
     okBtnColor,
+    contentSlot,
     onClose,
     onConfirm,
   } = props;
 
   return (
     <Modal
+      size={size ?? 'md'}
       backdrop={backdrop}
       placement={modalPlacement ?? 'center'}
       isOpen={isOpen}
@@ -68,6 +84,7 @@ function ConfirmModal(props: ConfirmModalProps) {
         </ModalHeader>
         <ModalBody>
           <p>{comfirmMessage}</p>
+          <div>{contentSlot}</div>
         </ModalBody>
         <ModalFooter>
           <Button
