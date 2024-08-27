@@ -13,6 +13,7 @@ export type Task = {
   due_date: string;
   assignee: string;
   reporter: string;
+  isDone: boolean;
 };
 
 export type NewTask = {

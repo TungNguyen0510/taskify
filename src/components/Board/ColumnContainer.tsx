@@ -179,28 +179,33 @@ function ColumnContainer(props: ColumnContainerProps) {
             )}
           </div>
 
-          <Dropdown placement="bottom-start">
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                color="default"
-                variant="light"
-                aria-label="more"
-                className="h-8"
-              >
-                <Icon name="threedot" />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Column Actions">
-              <DropdownItem
-                onClick={() => setIsConfirmDeleteColumn(true)}
-                className="font-semibold text-danger"
-                color="danger"
-              >
-                Delete
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+          {!(
+            (column.isDone === true && column.isTodo === false) ||
+            (column.isDone === false && column.isTodo === true)
+          ) && (
+            <Dropdown placement="bottom-start">
+              <DropdownTrigger>
+                <Button
+                  isIconOnly
+                  color="default"
+                  variant="light"
+                  aria-label="more"
+                  className="h-8"
+                >
+                  <Icon name="threedot" />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Column Actions">
+                <DropdownItem
+                  onClick={() => setIsConfirmDeleteColumn(true)}
+                  className="font-semibold text-danger"
+                  color="danger"
+                >
+                  Delete
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
         </div>
         <div className="scrollbar-2 flex grow flex-col gap-2 overflow-y-auto overflow-x-hidden p-2">
           <SortableContext items={tasksIds}>

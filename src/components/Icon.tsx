@@ -29,6 +29,16 @@ export const svgPath = {
       </g>
     </svg>
   ),
+  dashboard: (
+    <svg fill="currentColor" height="24px" width="24px" viewBox="0 0 16 16">
+      <g stroke-width="0" />
+      <g stroke-linecap="round" stroke-linejoin="round" />
+      <g>
+        {' '}
+        <path d="M4.64648,6.64648,7,4.293l2,2,1.64648-1.64649.707.707L9,7.707l-2-2L5.35352,7.35352ZM14,2V14H2V2ZM8,9H4v3H8Zm4,2H9v1h3Zm0-2H9v1h3Zm0-5H4V8h8V4ZM7,10H5v1H7Z" />{' '}
+      </g>
+    </svg>
+  ),
   setting: (
     <svg width="24" height="24" viewBox="0 0 24 24" role="presentation">
       <path

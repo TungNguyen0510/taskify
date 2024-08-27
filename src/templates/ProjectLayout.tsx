@@ -27,6 +27,11 @@ const tabs = [
     icon: 'backlog',
     link: 'backlog',
   },
+  {
+    name: 'Dashboard',
+    icon: 'dashboard',
+    link: 'dashboard',
+  },
 ];
 
 const ProjectLayout = (props: {

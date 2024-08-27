@@ -1,5 +1,4 @@
 import { Button } from '@nextui-org/react';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import { MainLayout } from '@/templates/MainLayout';
@@ -14,13 +13,13 @@ export default function Layout(props: { children: React.ReactNode }) {
             href="/"
             className="flex items-center bg-gradient-to-r from-cyan-200 to-indigo-600 bg-clip-text pr-10 text-lg font-bold text-transparent hover:from-cyan-200 hover:to-fuchsia-500"
           >
-            <Image
+            {/* <Image
               priority
               src="/assets/images/logo.png"
               width={32}
               height={32}
               alt="Logo"
-            />
+            /> */}
             <span>{AppConfig.name}</span>
           </Link>
 
