@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/TungNguyen0510/taskify/compare/v1.13.0...v1.14.0) (2024-08-28)
+
+
+### Features
+
+* line through done task ([12eb16e](https://github.com/TungNguyen0510/taskify/commit/12eb16ef5cc6a49542af003f8d6fe93c7692d594))
+
 # [1.13.0](https://github.com/TungNguyen0510/taskify/compare/v1.12.0...v1.13.0) (2024-08-27)
 
 
