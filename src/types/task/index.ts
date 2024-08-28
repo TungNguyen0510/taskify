@@ -10,11 +10,13 @@ export type Task = {
   pos: number;
   column_id: string;
   project_id: string;
+  start_date: string;
   due_date: string;
   assignee: string;
   reporter: string;
   isDone: boolean;
   isBacklog: boolean;
+  progress: number;
 };
 
 export type NewTask = {

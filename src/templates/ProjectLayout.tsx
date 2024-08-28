@@ -13,6 +13,11 @@ import { getUserRole } from '@/utils/Helpers';
 
 const tabs = [
   {
+    name: 'Timeline',
+    icon: 'timeline',
+    link: 'timeline',
+  },
+  {
     name: 'Board',
     icon: 'board',
     link: 'board',

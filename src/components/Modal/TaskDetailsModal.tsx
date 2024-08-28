@@ -1,11 +1,11 @@
 import 'md-editor-rt/lib/style.css';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import {
   Autocomplete,
   AutocompleteItem,
   Avatar,
   Button,
-  DatePicker,
   Divider,
   Modal,
   ModalBody,
@@ -21,6 +21,7 @@ import { MdEditor, MdPreview } from 'md-editor-rt';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
 import { toast } from 'react-toastify';
 
 import ActivityCard from '@/components/ActivityCard';
@@ -33,7 +34,6 @@ import { useUsersStore } from '@/stores/users';
 import type { NewActivity } from '@/types/activity';
 import { AppConfig } from '@/utils/AppConfig';
 import {
-  convertToISO,
   formatDateFull,
   getInitialsName,
   isExpiredDate,
@@ -95,6 +95,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   const [isEditSummary, setIsEditSummary] = useState(false);
   const [isEditDesciption, setIsEditDesciption] = useState(false);
+  const [isEditStartDate, setIsEditStartDate] = useState(false);
   const [isEditDueDate, setIsEditDueDate] = useState(false);
   const [isEditAssignee, setIsEditAssignee] = useState(false);
 
@@ -102,7 +103,8 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
   const [newDescription, setNewDescription] = useState(
     taskDetails?.description,
   );
-  // const [setNewDueDate] = useState<any>(taskDetails?.due_date);
+  const [newStartDate, setNewStartDate] = useState<any>();
+  const [newDueDate, setNewDueDate] = useState<any>();
   const [newAssignee, setNewAssignee] = useState<string | null | undefined>(
     null,
   );
@@ -113,6 +115,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   const editSummaryRef = useClickOutside(() => setIsEditSummary(false));
   const editDescriptionRef = useClickOutside(() => setIsEditDesciption(false));
+  const editStartDateRef = useClickOutside(() => setIsEditStartDate(false));
   const editDueDateRef = useClickOutside(() => setIsEditDueDate(false));
   const editAssigneeRef = useClickOutside(() => setIsEditAssignee(false));
 
@@ -241,6 +244,44 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
       await fetchTaskDetails(taskId);
 
       setIsEditDueDate(false);
+
+      if (taskDetails?.project_id) {
+        await fetchListTasks(taskDetails.project_id);
+      }
+    }
+  };
+
+  const updateStartDate = async (date: any) => {
+    if (currentUser?.id && taskDetails) {
+      const newActivity: NewActivity = {
+        action_type: 'UPDATED',
+        field: 'Start Date',
+        user_id: currentUser?.id,
+        project_id: taskDetails.project_id,
+        resource_id: taskDetails.id,
+        timestamp: new Date().toISOString(),
+      };
+
+      await updateTaskDetails(taskId, {
+        start_date: date,
+      });
+
+      toast.success('Update task start date successfully!', {
+        position: 'bottom-left',
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
+      await createNewActivity(newActivity);
+
+      await fetchTaskDetails(taskId);
+
+      setIsEditStartDate(false);
 
       if (taskDetails?.project_id) {
         await fetchListTasks(taskDetails.project_id);
@@ -598,6 +639,66 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                 </div>
                 <div className="flex flex-col gap-6 p-4">
                   <div className="flex items-center gap-2">
+                    <div className="min-w-28 text-slate-500">Start date</div>
+                    <div className="w-full cursor-pointer">
+                      {isEditStartDate ? (
+                        <div
+                          ref={
+                            editStartDateRef as React.RefObject<HTMLDivElement>
+                          }
+                        >
+                          <DatePicker
+                            autoFocus
+                            showIcon
+                            inline
+                            showTimeInput
+                            selected={newStartDate}
+                            maxDate={newDueDate}
+                            onChange={(date) => {
+                              setNewStartDate(date);
+                            }}
+                          >
+                            <div className="flex w-full justify-end">
+                              <Button
+                                color="primary"
+                                size="sm"
+                                radius="sm"
+                                onClick={() => updateStartDate(newStartDate)}
+                              >
+                                Save
+                              </Button>
+                            </div>
+                          </DatePicker>
+                        </div>
+                      ) : (
+                        <div
+                          aria-hidden="true"
+                          onClick={() => {
+                            setIsEditStartDate(true);
+                            if (
+                              taskDetails?.start_date &&
+                              taskDetails?.due_date
+                            ) {
+                              setNewStartDate(new Date(taskDetails.start_date));
+                              setNewDueDate(new Date(taskDetails.due_date));
+                            }
+                          }}
+                        >
+                          {taskDetails?.start_date ? (
+                            <div className="w-full rounded-md bg-zinc-200 px-2 py-1 font-semibold">
+                              {formatDateFull(taskDetails.start_date)}
+                            </div>
+                          ) : (
+                            <div className="w-full rounded-md px-2 py-1 hover:bg-zinc-100 hover:text-zinc-900">
+                              None
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Due date</div>
                     <div className="w-full cursor-pointer">
                       {isEditDueDate ? (
@@ -607,25 +708,40 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                           }
                         >
                           <DatePicker
-                            label="Due Date"
-                            variant="bordered"
-                            hideTimeZone
-                            showMonthAndYearPickers
-                            // value={parseDateTime(newDueDate) as any}
-                            onChange={async (date: any) => {
-                              const isoDate = convertToISO(date);
-                              // setNewDueDate(isoDate);
-
-                              updateDueDate(isoDate);
+                            autoFocus
+                            showIcon
+                            inline
+                            showTimeInput
+                            selected={newDueDate}
+                            minDate={newStartDate}
+                            onChange={(date) => {
+                              setNewDueDate(date);
                             }}
-                          />
+                          >
+                            <div className="flex w-full justify-end">
+                              <Button
+                                color="primary"
+                                size="sm"
+                                radius="sm"
+                                onClick={() => updateDueDate(newDueDate)}
+                              >
+                                Save
+                              </Button>
+                            </div>
+                          </DatePicker>
                         </div>
                       ) : (
                         <div
                           aria-hidden="true"
                           onClick={() => {
                             setIsEditDueDate(true);
-                            // setNewDueDate(taskDetails?.due_date);
+                            if (
+                              taskDetails?.start_date &&
+                              taskDetails?.due_date
+                            ) {
+                              setNewStartDate(new Date(taskDetails.start_date));
+                              setNewDueDate(new Date(taskDetails.due_date));
+                            }
                           }}
                         >
                           {taskDetails?.due_date ? (

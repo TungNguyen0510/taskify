@@ -31,7 +31,8 @@ function CreateTaskModal(props: CreateTaskModalProps) {
   const userId = session?.data?.user.id;
 
   const { tasks, createNewTask, fetchListTasks } = useTasksStore();
-  const { currentProject, fetchCurrentProject } = useProjectsStore();
+  const { currentProject, fetchCurrentProject, updateCurrentProject } =
+    useProjectsStore();
   const { columns, fetchListColumns } = useColumnsStore();
 
   const [createTaskSummary, setCreateTaskSummary] = useState('');
@@ -71,6 +72,10 @@ function CreateTaskModal(props: CreateTaskModalProps) {
 
     await createNewTask(newTask);
 
+    await updateCurrentProject(projectId, {
+      tasks_count: currentProject.tasks_count + 1,
+    });
+
     toast.success('Create new task successfully!', {
       position: 'bottom-left',
       autoClose: 1500,
@@ -83,6 +88,7 @@ function CreateTaskModal(props: CreateTaskModalProps) {
     });
 
     await fetchListTasks(projectId);
+    await fetchCurrentProject(projectId);
   };
 
   return (
