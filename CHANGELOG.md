@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/TungNguyen0510/taskify/compare/v1.14.0...v1.14.1) (2024-08-28)
+
+
+### Bug Fixes
+
+* wip ([da8f3f1](https://github.com/TungNguyen0510/taskify/commit/da8f3f1241a69ffac89b8dc1e0d48806f5b9741a))
+
 # [1.14.0](https://github.com/TungNguyen0510/taskify/compare/v1.13.0...v1.14.0) (2024-08-28)
 
 
