@@ -271,7 +271,9 @@ export default function ListTasks({
             <div className="size-4">
               <Icon name="checkSquare" />
             </div>
-            <div className="text-xs text-zinc-500">
+            <div
+              className={`text-xs text-zinc-500 ${task.isDone ? 'text-zinc-300 line-through' : ''}`}
+            >
               {useProjectsStore.getState().currentProject?.key}-{task.key}
             </div>
           </div>

@@ -346,7 +346,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
               content={`Go to Task ${projectKey}-${taskDetails?.key} Page`}
             >
               <div
-                className="cursor-pointer text-xs text-zinc-500"
+                className={`cursor-pointer text-xs text-zinc-500 ${taskDetails?.isDone ? 'text-zinc-300 line-through' : ''}`}
                 aria-hidden="true"
                 onClick={() =>
                   route.push(

@@ -192,6 +192,8 @@ function TaskPage({
 
   const updateTaskStatus = async (columnId: string) => {
     if (currentUser?.id && taskDetails) {
+      const doneColumnId = columns.find((column) => column.isDone === true)?.id;
+
       const newActivity: NewActivity = {
         action_type: 'UPDATED',
         field: 'Status',
@@ -204,6 +206,12 @@ function TaskPage({
       await updateTaskDetails(params.taskId, {
         column_id: columnId,
       });
+
+      if (columnId === doneColumnId) {
+        await updateTaskDetails(params.taskId, {
+          isDone: true,
+        });
+      }
 
       toast.success('Update task status successfully!', {
         position: 'bottom-left',
@@ -313,7 +321,9 @@ function TaskPage({
             <div className="size-4">
               <Icon name="checkSquare" />
             </div>
-            <div className="text-xs text-zinc-500">
+            <div
+              className={`text-xs text-zinc-500 ${taskDetails?.isDone ? 'text-zinc-300 line-through' : ''}`}
+            >
               {projectKey}-{taskDetails?.key}
             </div>
           </div>

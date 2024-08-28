@@ -142,11 +142,11 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
     },
     data: [
       {
-        type: 'pyramid',
+        type: 'doughnut',
         showInLegend: true,
+        indexLabel: '{label}: {y}',
         legendText: '{label}',
-        indexLabel: '{label} - {y}%',
-        toolTipContent: '<b>{label}</b>: {y} <b>({percentage}%)</b>',
+        yValueFormatString: "#,###'%'",
         dataPoints: calculateStatusPercentage(),
       },
     ],

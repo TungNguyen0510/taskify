@@ -574,7 +574,7 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
                     setIsCreatingColumn(false);
                   }}
                 />
-                <div className="flex w-full justify-end gap-2">
+                <div className="flex w-full min-w-64 justify-end gap-2">
                   <Button
                     isIconOnly
                     color="danger"
