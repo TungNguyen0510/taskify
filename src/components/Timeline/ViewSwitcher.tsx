@@ -15,7 +15,7 @@ export const ViewSwitcher = ({
   isChecked,
 }: ViewSwitcherProps) => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-wrap items-center justify-between">
       <Switch
         isSelected={isChecked}
         onValueChange={() => onViewListChange(!isChecked)}

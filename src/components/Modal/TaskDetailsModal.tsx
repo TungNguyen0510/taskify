@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import 'md-editor-rt/lib/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -41,6 +42,7 @@ import {
 
 import AvatarUser from '../AvatarUser';
 import Icon from '../Icon';
+import Progress from '../Progress';
 
 interface TaskDetailsModalProps {
   isOpen: boolean;
@@ -71,6 +73,33 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
   const { columns } = useColumnsStore();
 
+  const [isEditSummary, setIsEditSummary] = useState(false);
+  const [isEditDesciption, setIsEditDesciption] = useState(false);
+  const [isEditStartDate, setIsEditStartDate] = useState(false);
+  const [isEditDueDate, setIsEditDueDate] = useState(false);
+  const [isEditAssignee, setIsEditAssignee] = useState(false);
+
+  const [newSummary, setNewSummary] = useState(taskDetails?.summary);
+  const [newDescription, setNewDescription] = useState(
+    taskDetails?.description,
+  );
+  const [newProgress, setNewProgress] = useState<any>();
+  const [newStartDate, setNewStartDate] = useState<any>();
+  const [newDueDate, setNewDueDate] = useState<any>();
+  const [newAssignee, setNewAssignee] = useState<string | null | undefined>(
+    null,
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [editorId] = useState(`editor${taskId}`);
+
+  const editSummaryRef = useClickOutside(() => setIsEditSummary(false));
+  const editDescriptionRef = useClickOutside(() => setIsEditDesciption(false));
+  const editStartDateRef = useClickOutside(() => setIsEditStartDate(false));
+  const editDueDateRef = useClickOutside(() => setIsEditDueDate(false));
+  const editAssigneeRef = useClickOutside(() => setIsEditAssignee(false));
+
   useEffect(() => {
     const fetchData = async () => {
       await fetchTaskDetails(taskId);
@@ -90,34 +119,10 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
     if (taskDetails) {
       fetchActivities();
+
+      setNewProgress(taskDetails.progress);
     }
   }, [taskDetails, fetchListActivities]);
-
-  const [isEditSummary, setIsEditSummary] = useState(false);
-  const [isEditDesciption, setIsEditDesciption] = useState(false);
-  const [isEditStartDate, setIsEditStartDate] = useState(false);
-  const [isEditDueDate, setIsEditDueDate] = useState(false);
-  const [isEditAssignee, setIsEditAssignee] = useState(false);
-
-  const [newSummary, setNewSummary] = useState(taskDetails?.summary);
-  const [newDescription, setNewDescription] = useState(
-    taskDetails?.description,
-  );
-  const [newStartDate, setNewStartDate] = useState<any>();
-  const [newDueDate, setNewDueDate] = useState<any>();
-  const [newAssignee, setNewAssignee] = useState<string | null | undefined>(
-    null,
-  );
-
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [editorId] = useState(`editor${taskId}`);
-
-  const editSummaryRef = useClickOutside(() => setIsEditSummary(false));
-  const editDescriptionRef = useClickOutside(() => setIsEditDesciption(false));
-  const editStartDateRef = useClickOutside(() => setIsEditStartDate(false));
-  const editDueDateRef = useClickOutside(() => setIsEditDueDate(false));
-  const editAssigneeRef = useClickOutside(() => setIsEditAssignee(false));
 
   const formattedColumns = columns.map((column) => ({
     id: column.id,
@@ -245,6 +250,28 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
       setIsEditDueDate(false);
 
+      if (taskDetails?.project_id) {
+        await fetchListTasks(taskDetails.project_id);
+      }
+    }
+  };
+
+  const updateProgress = async (progress: number) => {
+    if (currentUser?.id && taskDetails) {
+      const newActivity: NewActivity = {
+        action_type: 'UPDATED',
+        field: 'Progress',
+        user_id: currentUser?.id,
+        project_id: taskDetails.project_id,
+        resource_id: taskDetails.id,
+        timestamp: new Date().toISOString(),
+      };
+      await updateTaskDetails(taskId, {
+        progress,
+      });
+      await createNewActivity(newActivity);
+      await fetchTaskDetails(taskId);
+      await fetchListActivities(taskDetails.id);
       if (taskDetails?.project_id) {
         await fetchListTasks(taskDetails.project_id);
       }
@@ -638,6 +665,20 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                   Details
                 </div>
                 <div className="flex flex-col gap-6 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="-mt-7 min-w-28 text-slate-500">
+                      Progress
+                    </div>
+                    <div className="w-full cursor-pointer">
+                      <Progress
+                        value={newProgress}
+                        onChangeEnd={(newValue) => {
+                          setNewProgress(newValue);
+                          updateProgress(newValue);
+                        }}
+                      />
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Start date</div>
                     <div className="w-full cursor-pointer">

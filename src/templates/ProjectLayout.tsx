@@ -89,7 +89,7 @@ const ProjectLayout = (props: {
                 <div className="absolute left-4 h-6 w-1 rounded-r-lg bg-blue-500" />
               ) : null}
               <Icon name={tab.icon} />
-              <span className="text-nowrap">{tab.name}</span>
+              <span className="select-none text-nowrap">{tab.name}</span>
             </div>
           </div>
         ))}
@@ -109,7 +109,9 @@ const ProjectLayout = (props: {
                   <div className="absolute left-4 h-6 w-1 rounded-r-lg bg-blue-500" />
                 ) : null}
                 <Icon name="setting" />
-                <span className="text-nowrap">Project settings</span>
+                <span className="select-none text-nowrap">
+                  Project settings
+                </span>
               </div>
             </div>
           </div>

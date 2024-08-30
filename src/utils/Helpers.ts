@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-
 import { useActivitiesStore } from '@/stores/activity';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
@@ -99,57 +97,22 @@ export function getUserRole(
   return member ? member.project_role : undefined;
 }
 
-interface TimeData {
-  calendar: { identifier: string };
-  era: string;
-  year: number;
-  month: number;
-  day: number;
-  timeZone: string;
-  offset: number;
-  hour: number;
-  minute: number;
-  second: number;
-  millisecond: number;
-}
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  wait: number,
+): T {
+  let timeout: ReturnType<typeof setTimeout> | null;
 
-export function convertToISO(timeData: TimeData): string {
-  const { year, month, day, hour, minute, second, millisecond, timeZone } =
-    timeData;
+  return function debounced(this: any, ...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func.apply(this, args);
+    };
 
-  const localDate = DateTime.fromObject(
-    {
-      year,
-      month,
-      day,
-      hour,
-      minute,
-      second,
-      millisecond,
-    },
-    { zone: timeZone },
-  );
+    if (timeout) {
+      clearTimeout(timeout);
+    }
 
-  const isoString = localDate.toISO();
-  return isoString !== null ? isoString : '';
-}
-
-export function convertFromISO(isoString: string) {
-  const dateTime = DateTime.fromISO(isoString, { setZone: true });
-
-  return {
-    calendar: {
-      identifier: 'gregory',
-    },
-    era: 'AD',
-    year: dateTime.year,
-    month: dateTime.month,
-    day: dateTime.day,
-    timeZone: dateTime.zoneName,
-    offset: dateTime.offset * 60 * 1000,
-    hour: dateTime.hour,
-    minute: dateTime.minute,
-    second: dateTime.second,
-    millisecond: dateTime.millisecond,
-  };
+    timeout = setTimeout(later, wait);
+  } as T;
 }
