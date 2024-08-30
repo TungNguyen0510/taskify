@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/TungNguyen0510/taskify/compare/v1.14.1...v1.15.0) (2024-08-30)
+
+
+### Features
+
+* progress ([e4042f9](https://github.com/TungNguyen0510/taskify/commit/e4042f9d4a342deac9fd716375514b8d229c0319))
+
 ## [1.14.1](https://github.com/TungNguyen0510/taskify/compare/v1.14.0...v1.14.1) (2024-08-28)
 
 
