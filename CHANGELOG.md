@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/TungNguyen0510/taskify/compare/v1.15.0...v1.16.0) (2024-09-01)
+
+
+### Features
+
+* your-work page ([b84ec60](https://github.com/TungNguyen0510/taskify/commit/b84ec6024d27004a3683e879baccdfc71e52f403))
+
 # [1.15.0](https://github.com/TungNguyen0510/taskify/compare/v1.14.1...v1.15.0) (2024-08-30)
 
 
