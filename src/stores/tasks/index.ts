@@ -19,6 +19,8 @@ type Actions = {
   deleteTask: (taskId: string) => void;
   fetchTaskDetails: (taskId: string) => void;
   updateTaskDetails: (taskId: string, data: any) => void;
+  countMyTasks: (projectId: string, userId: string) => Promise<any>;
+  countTotalTasks: (projectId: string) => Promise<any>;
   reset: () => void;
 };
 
@@ -84,6 +86,20 @@ export const useTasksStore = create<State & Actions>()(
 
         updateTaskDetails: async (taskId: any, data: any) => {
           await api.patch(`/items/Task/${taskId}`, data);
+        },
+
+        countMyTasks: async (projectId: string, userId: string) => {
+          const response = await api.get<any>(
+            `/items/Task?filter[project_id][_eq]=${projectId}&filter[assignee][_eq]=${userId}&aggregate[count]=*`,
+          );
+          return response.data.data[0].count;
+        },
+
+        countTotalTasks: async (projectId: string) => {
+          const response = await api.get<any>(
+            `/items/Task?filter[project_id][_eq]=${projectId}&aggregate[count]=*`,
+          );
+          return response.data.data[0].count;
         },
 
         reset: () => {

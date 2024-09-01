@@ -96,23 +96,3 @@ export function getUserRole(
   const member = members?.find((m) => m.directus_users_id === userId);
   return member ? member.project_role : undefined;
 }
-
-export function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  wait: number,
-): T {
-  let timeout: ReturnType<typeof setTimeout> | null;
-
-  return function debounced(this: any, ...args: Parameters<T>) {
-    const later = () => {
-      timeout = null;
-      func.apply(this, args);
-    };
-
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-
-    timeout = setTimeout(later, wait);
-  } as T;
-}

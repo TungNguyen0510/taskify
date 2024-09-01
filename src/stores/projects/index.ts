@@ -35,6 +35,7 @@ export const useProjectsStore = create<State & Actions>()(
         fetchListProjects: async (userId: string) => {
           const response = await api.get<any>('/items/Project', {
             params: {
+              fields: '*,project_members.*',
               sort: ['date_created'],
               filter: {
                 project_members: {

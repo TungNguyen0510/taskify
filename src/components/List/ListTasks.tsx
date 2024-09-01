@@ -379,7 +379,7 @@ export default function ListTasks({
                   Details
                 </DropdownItem>
                 <DropdownItem
-                  className="font-semibold"
+                  className={`font-semibold ${task.isBacklog ? 'hidden' : ''}`}
                   onClick={() => {
                     setIsOpenAddToBacklogModal(true);
                     setCurrentTaskId(task.id);

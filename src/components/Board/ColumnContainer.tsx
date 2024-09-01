@@ -125,7 +125,7 @@ function ColumnContainer(props: ColumnContainerProps) {
         <div
           {...attributes}
           {...listeners}
-          className="flex justify-between gap-1 bg-slate-200 p-2"
+          className="flex min-h-12 justify-between gap-1 bg-slate-200 p-2"
         >
           <div className="relative flex items-center gap-2">
             <div className="flex size-5 items-center justify-center rounded-full bg-gray-500 p-1 text-tiny text-white">
