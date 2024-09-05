@@ -481,13 +481,9 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
   return (
     <>
       <div className="flex flex-col gap-2 px-4 pb-2">
-        {currentProject && (
-          <div className="text-xl font-semibold">
-            {currentProject.name} Board
-          </div>
-        )}
+        <div className="text-xl font-semibold">Board</div>
 
-        <div className="flex items-end justify-between gap-3">
+        <div className="flex items-center gap-4">
           <Input
             className="w-full sm:max-w-[34%]"
             placeholder="Search by summary..."

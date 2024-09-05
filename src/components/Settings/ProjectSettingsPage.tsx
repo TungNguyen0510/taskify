@@ -51,11 +51,7 @@ function ProjectSettingsPage({ params }: { params: { projectId: string } }) {
       {currentProject && (
         <div className="w-[calc(100vw-18.875em)] min-w-[calc(100vw-18.875em)] px-4">
           <div className="mb-8">
-            {currentProject?.name && (
-              <div className="text-xl font-semibold">
-                {currentProject?.name} Settings
-              </div>
-            )}
+            <div className="text-xl font-semibold">Settings</div>
           </div>
 
           <div className="flex w-full flex-col">

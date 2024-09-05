@@ -327,7 +327,7 @@ function YourWorkPage() {
         'scrollbar-1',
         'min-w-[calc(100vw-3.875em)]',
       ],
-      th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
+      // th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
       td: [
         // changing the rows border radius
         // first
@@ -357,6 +357,7 @@ function YourWorkPage() {
           radius="none"
           color="primary"
           isStriped
+          isHeaderSticky
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
           classNames={classNames}

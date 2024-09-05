@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
@@ -6,6 +7,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Pagination,
   Select,
   SelectItem,
   Spinner,
@@ -16,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@nextui-org/react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { useProjectsStore } from '@/stores/projects';
@@ -115,6 +117,10 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
     }
   }, []);
 
+  const [page, setPage] = useState(1);
+
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const hasSearchFilter = Boolean(filterValue);
 
   const filteredItems = React.useMemo(() => {
@@ -132,6 +138,15 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
 
     return filteredMembers;
   }, [filteredListMemberTemp, filterValue, hasSearchFilter, roleFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
 
   const updateRoleMember = async (memberId: number, role: string) => {
     try {
@@ -255,6 +270,57 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
     }
   }, []);
 
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = useCallback((e: any) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
+  const bottomContent = useMemo(() => {
+    return (
+      <div className="flex items-center justify-between p-2">
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+        />
+        <div className="hidden w-[30%] justify-end gap-2 sm:flex">
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }, [filteredListMemberTemp?.length, page, pages, onPreviousPage, onNextPage]);
+
   const classNames = React.useMemo(
     () => ({
       wrapper: [
@@ -263,7 +329,7 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
         'scrollbar-1',
         'min-w-[calc(100vw-21.5em)]',
       ],
-      th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
+      // th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
       td: [
         // changing the rows border radius
         // first
@@ -330,14 +396,29 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <div>
+        <div className="flex items-center justify-between">
           <span className="text-small text-default-400">
             Total {filteredListMemberTemp?.length} members
           </span>
+          <label className="flex items-center text-small text-default-400">
+            Rows per page:
+            <select
+              className="bg-transparent text-small text-default-400 outline-none"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="10">10</option>
+              <option value="30">30</option>
+              <option value="100">100</option>
+            </select>
+          </label>
         </div>
         <Table
           radius="none"
+          isStriped
+          isHeaderSticky
           classNames={classNames}
+          bottomContent={bottomContent}
+          bottomContentPlacement="outside"
           aria-label="List of members"
         >
           <TableHeader columns={columns}>
@@ -353,7 +434,7 @@ function ProjectSettingsAccess({ params }: { params: { projectId: string } }) {
             )}
           </TableHeader>
           <TableBody
-            items={filteredItems}
+            items={items}
             emptyContent="No members found"
             loadingContent={<Spinner label="Loading..." />}
           >

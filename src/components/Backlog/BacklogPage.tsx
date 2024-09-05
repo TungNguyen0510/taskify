@@ -479,8 +479,8 @@ export default function BacklogPage({
     filterValue,
     statusFilter,
     visibleColumns,
+    filteredItems,
     onRowsPerPageChange,
-    tasks.length,
     onSearchChange,
     hasSearchFilter,
   ]);
@@ -539,7 +539,7 @@ export default function BacklogPage({
         'scrollbar-1',
         'min-w-[calc(100vw-18.875em)]',
       ],
-      th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
+      // th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
       td: [
         // changing the rows border radius
         // first
@@ -563,6 +563,7 @@ export default function BacklogPage({
         aria-label="List tasks"
         radius="none"
         isStriped
+        isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={classNames}
