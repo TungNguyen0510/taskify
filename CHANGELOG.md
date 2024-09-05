@@ -1,3 +1,10 @@
+## [1.16.2](https://github.com/TungNguyen0510/taskify/compare/v1.16.1...v1.16.2) (2024-09-05)
+
+
+### Bug Fixes
+
+* pagination ([54b476c](https://github.com/TungNguyen0510/taskify/commit/54b476ccaa220173d1a51d9dc506b23ea7323a7b))
+
 ## [1.16.1](https://github.com/TungNguyen0510/taskify/compare/v1.16.0...v1.16.1) (2024-09-01)
 
 
