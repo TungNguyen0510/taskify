@@ -45,7 +45,8 @@ const headers = [
   { name: 'MY OPEN TASKS', uid: 'my_tasks' },
   { name: 'MEMBERS', uid: 'members' },
   { name: 'MY ROLE', uid: 'role' },
-  { name: 'DATE CREATED', uid: 'date_created' },
+  { name: 'START DATE', uid: 'start_date' },
+  { name: 'END DATE', uid: 'end_date' },
 ];
 
 function YourWorkPage() {
@@ -213,18 +214,40 @@ function YourWorkPage() {
           </div>
         );
 
-      case 'date_created':
+      case 'start_date':
         return (
           <div>
-            {project.date_created ? (
+            {project.start_date ? (
               <Tooltip
                 showArrow
                 color="foreground"
                 radius="sm"
-                content={`Date created: ${formatDateFull(project.date_created)}`}
+                content={`Start date: ${formatDateFull(project.start_date)}`}
               >
                 <p className="w-fit text-nowrap rounded-md bg-zinc-200 px-2 py-1 font-semibold">
-                  {formatDateMDY(project.date_created)}
+                  {formatDateMDY(project.start_date)}
+                </p>
+              </Tooltip>
+            ) : (
+              <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
+                None
+              </div>
+            )}
+          </div>
+        );
+
+      case 'end_date':
+        return (
+          <div>
+            {project.end_date ? (
+              <Tooltip
+                showArrow
+                color="foreground"
+                radius="sm"
+                content={`End date: ${formatDateFull(project.end_date)}`}
+              >
+                <p className="w-fit text-nowrap rounded-md bg-zinc-200 px-2 py-1 font-semibold">
+                  {formatDateMDY(project.end_date)}
                 </p>
               </Tooltip>
             ) : (

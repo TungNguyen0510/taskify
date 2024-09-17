@@ -1,10 +1,17 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import UserArea from '@/components/UserArea';
 import { MainLayout } from '@/templates/MainLayout';
 import { AppConfig } from '@/utils/AppConfig';
 
 export default function AppLayout(props: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const pathParts = pathname.split('/');
+  const lastRoute = pathParts[pathParts.length - 1];
+
   return (
     <MainLayout
       leftNav={
@@ -25,13 +32,13 @@ export default function AppLayout(props: { children: React.ReactNode }) {
 
           <Link
             href="/u/your-work"
-            className="font-semibold text-black hover:text-blue-500"
+            className={`font-semibold text-black hover:text-blue-500 ${lastRoute === 'your-work' ? `text-blue-500` : ''}`}
           >
             Your work
           </Link>
           <Link
             href="/u/profile"
-            className="font-semibold text-black hover:text-blue-500"
+            className={`font-semibold text-black hover:text-blue-500 ${lastRoute === 'profile' ? `text-blue-500` : ''}`}
           >
             Profile
           </Link>

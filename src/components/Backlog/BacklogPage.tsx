@@ -48,6 +48,8 @@ const headers = [
   { name: 'KEY', uid: 'key', sortable: true, minWidth: '100px' },
   { name: 'SUMMARY', uid: 'summary', sortable: true },
   { name: 'STATUS', uid: 'column_id', sortable: true },
+  { name: 'START DATE', uid: 'start_date' },
+  { name: 'DUE DATE', uid: 'due_date' },
   { name: 'ASSIGNEE', uid: 'assignee' },
   { name: 'ACTIONS', uid: 'actions' },
 ];
@@ -56,6 +58,8 @@ const INITIAL_VISIBLE_COLUMNS = [
   'key',
   'summary',
   'column_id',
+  'start_date',
+  'due_date',
   'assignee',
   'actions',
 ];
@@ -287,6 +291,28 @@ export default function BacklogPage({
         );
       case 'reporter':
         return <AvatarUser userId={task.reporter} />;
+      case 'start_date':
+        return (
+          <div>
+            {task.start_date ? (
+              <Tooltip
+                showArrow
+                color="foreground"
+                radius="sm"
+                content={`Start date: ${formatDateFull(task.start_date)}`}
+              >
+                <p className="w-fit rounded-md bg-zinc-200 px-2 py-1 font-semibold">
+                  {formatDateMDY(task.start_date)}
+                </p>
+              </Tooltip>
+            ) : (
+              <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
+                None
+              </div>
+            )}
+          </div>
+        );
+
       case 'due_date':
         return (
           <div>

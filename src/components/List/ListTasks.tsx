@@ -49,7 +49,8 @@ const headers = [
   { name: 'SUMMARY', uid: 'summary', sortable: true },
   { name: 'STATUS', uid: 'column_id', sortable: true },
   { name: 'ASSIGNEE', uid: 'assignee' },
-  { name: 'DUE DATE', uid: 'due_date', sortable: true },
+  { name: 'START DATE', uid: 'start_date' },
+  { name: 'DUE DATE', uid: 'due_date' },
   { name: 'DATE CREATED', uid: 'date_created', sortable: true },
   { name: 'DATE UPDATED', uid: 'date_updated', sortable: true },
   { name: 'REPORTER', uid: 'reporter', minWidth: '300px' },
@@ -61,6 +62,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   'summary',
   'column_id',
   'assignee',
+  'start_date',
   'due_date',
   'reporter',
   'actions',
@@ -296,6 +298,27 @@ export default function ListTasks({
         );
       case 'reporter':
         return <AvatarUser userId={task.reporter} />;
+      case 'start_date':
+        return (
+          <div>
+            {task.start_date ? (
+              <Tooltip
+                showArrow
+                color="foreground"
+                radius="sm"
+                content={`Start date: ${formatDateFull(task.start_date)}`}
+              >
+                <p className="w-fit rounded-md bg-zinc-200 px-2 py-1 font-semibold">
+                  {formatDateMDY(task.start_date)}
+                </p>
+              </Tooltip>
+            ) : (
+              <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
+                None
+              </div>
+            )}
+          </div>
+        );
       case 'due_date':
         return (
           <div>

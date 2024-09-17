@@ -1,5 +1,7 @@
 'use client';
 
+import 'react-datepicker/dist/react-datepicker.css';
+
 import {
   Autocomplete,
   AutocompleteItem,
@@ -648,7 +650,7 @@ function TaskPage({
                   <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Start date</div>
                     <div className="w-full cursor-pointer">
-                      {isEditStartDate ? (
+                      {isEditStartDate && currentProject ? (
                         <div
                           ref={
                             editStartDateRef as React.RefObject<HTMLDivElement>
@@ -660,7 +662,10 @@ function TaskPage({
                             inline
                             showTimeInput
                             selected={newStartDate}
-                            maxDate={newDueDate}
+                            minDate={new Date(currentProject.start_date)}
+                            maxDate={
+                              newDueDate || new Date(currentProject.end_date)
+                            }
                             onChange={(date) => {
                               setNewStartDate(date);
                             }}
@@ -708,7 +713,7 @@ function TaskPage({
                   <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Due date</div>
                     <div className="w-full cursor-pointer">
-                      {isEditDueDate ? (
+                      {isEditDueDate && currentProject ? (
                         <div
                           ref={
                             editDueDateRef as React.RefObject<HTMLDivElement>
@@ -720,7 +725,11 @@ function TaskPage({
                             inline
                             showTimeInput
                             selected={newDueDate}
-                            minDate={newStartDate}
+                            minDate={
+                              newStartDate ||
+                              new Date(currentProject.start_date)
+                            }
+                            maxDate={new Date(currentProject.end_date)}
                             onChange={(date) => {
                               setNewDueDate(date);
                             }}

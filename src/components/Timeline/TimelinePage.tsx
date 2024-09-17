@@ -91,8 +91,12 @@ function TimelinePage({ params }: { params: { projectId: string } }) {
     (totalProgress / (tranferTasks.length * 100)) * 100;
 
   const project = {
-    start: earliestStart,
-    end: latestEnd,
+    start: currentProject?.start_date
+      ? new Date(currentProject.start_date)
+      : earliestStart,
+    end: currentProject?.end_date
+      ? new Date(currentProject.end_date)
+      : latestEnd,
     name: currentProject?.name,
     id: currentProject?.id,
     progress: progressPercentage,

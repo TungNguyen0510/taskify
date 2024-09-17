@@ -19,4 +19,6 @@ export type Project = {
   tasks_count: number;
   owner: string;
   project_members: ProjectMember[];
+  start_date: string;
+  end_date: string;
 };

@@ -51,8 +51,10 @@ const api = {
   ): Promise<AxiosResponse<T>> => axiosInstance.patch(url, data, config),
   delete: <T>(
     url: string,
+    data?: any,
     config?: AxiosRequestConfig,
-  ): Promise<AxiosResponse<T>> => axiosInstance.delete(url, config),
+  ): Promise<AxiosResponse<T>> =>
+    axiosInstance.delete(url, { ...config, data }),
 };
 
 export default api;

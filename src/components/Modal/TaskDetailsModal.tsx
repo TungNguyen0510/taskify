@@ -248,8 +248,6 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
 
       await fetchTaskDetails(taskId);
 
-      setIsEditDueDate(false);
-
       if (taskDetails?.project_id) {
         await fetchListTasks(taskDetails.project_id);
       }
@@ -399,7 +397,10 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
       backdrop="opaque"
       placement="center"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => {
+        useTasksStore.getState().taskDetails = null;
+        onClose();
+      }}
     >
       <ModalContent className="size-full max-h-[calc(100vh-2em)] max-w-[calc(100vw-2em)]">
         <ModalHeader className="flex flex-col gap-1">
@@ -682,7 +683,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                   <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Start date</div>
                     <div className="w-full cursor-pointer">
-                      {isEditStartDate ? (
+                      {isEditStartDate && currentProject ? (
                         <div
                           ref={
                             editStartDateRef as React.RefObject<HTMLDivElement>
@@ -694,7 +695,10 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                             inline
                             showTimeInput
                             selected={newStartDate}
-                            maxDate={newDueDate}
+                            minDate={new Date(currentProject.start_date)}
+                            maxDate={
+                              newDueDate || new Date(currentProject.end_date)
+                            }
                             onChange={(date) => {
                               setNewStartDate(date);
                             }}
@@ -742,7 +746,7 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                   <div className="flex items-center gap-2">
                     <div className="min-w-28 text-slate-500">Due date</div>
                     <div className="w-full cursor-pointer">
-                      {isEditDueDate ? (
+                      {isEditDueDate && currentProject ? (
                         <div
                           ref={
                             editDueDateRef as React.RefObject<HTMLDivElement>
@@ -754,7 +758,11 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
                             inline
                             showTimeInput
                             selected={newDueDate}
-                            minDate={newStartDate}
+                            minDate={
+                              newStartDate ||
+                              new Date(currentProject.start_date)
+                            }
+                            maxDate={new Date(currentProject.end_date)}
                             onChange={(date) => {
                               setNewDueDate(date);
                             }}

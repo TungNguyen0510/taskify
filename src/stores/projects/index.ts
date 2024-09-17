@@ -15,6 +15,7 @@ type Actions = {
   fetchCurrentProject: (projectId: string) => void;
   updateCurrentProject: (projectId: string, data: any) => void;
   createNewProject: (newProject: any) => void;
+  deleteProject: (projectId: string) => void;
   removeProjectMember: (memberId: number) => void;
   updateProjectMember: (memberId: number, data: any) => void;
   addProjectMember: (newMember: any) => void;
@@ -95,6 +96,46 @@ export const useProjectsStore = create<State & Actions>()(
             directus_users_id: newProject.owner,
             project_role: 'OWNER',
           });
+        },
+
+        deleteProject: async (projectId: string) => {
+          await api.delete('/items/Project_directus_users', {
+            query: {
+              filter: {
+                Project_id: {
+                  _eq: projectId,
+                },
+              },
+            },
+          });
+          await api.delete('/items/Task', {
+            query: {
+              filter: {
+                project_id: {
+                  _eq: projectId,
+                },
+              },
+            },
+          });
+          await api.delete('/items/Column', {
+            query: {
+              filter: {
+                project_id: {
+                  _eq: projectId,
+                },
+              },
+            },
+          });
+          await api.delete('/items/ActivityLog', {
+            query: {
+              filter: {
+                project_id: {
+                  _eq: projectId,
+                },
+              },
+            },
+          });
+          await api.delete(`/items/Project/${projectId}`);
         },
 
         addProjectMember: async (newMember: any) => {

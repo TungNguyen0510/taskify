@@ -39,3 +39,7 @@
 .scrollbar-2::-webkit-scrollbar-thumb:hover {
   background-color: #3b82f6;
 }
+
+.react-datepicker-popper {
+  z-index: 50 !important;
+}
