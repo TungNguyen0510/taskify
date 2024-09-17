@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/TungNguyen0510/taskify/compare/v1.16.2...v1.17.0) (2024-09-17)
+
+
+### Features
+
+* add start date & end date project ([753d455](https://github.com/TungNguyen0510/taskify/commit/753d45511c187e45bc92ea5e9405c789fd514767))
+
 ## [1.16.2](https://github.com/TungNguyen0510/taskify/compare/v1.16.1...v1.16.2) (2024-09-05)
 
 
