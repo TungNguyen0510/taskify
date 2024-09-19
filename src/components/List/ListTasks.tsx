@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -245,10 +247,15 @@ export default function ListTasks({
 
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => {
-      const first = a[sortDescriptor.column as keyof Task];
-      const second = b[sortDescriptor.column as keyof Task];
-      let cmp;
-      if (first === null || second === null) {
+      const first = parseFloat(
+        a[sortDescriptor.column as keyof Task] as string,
+      );
+      const second = parseFloat(
+        b[sortDescriptor.column as keyof Task] as string,
+      );
+      let cmp: number;
+
+      if (isNaN(first) || isNaN(second)) {
         cmp = 0;
       } else if (first < second) {
         cmp = -1;
