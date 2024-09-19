@@ -1,6 +1,6 @@
 {
   "name": "taskify",
-  "version": "1.17.3",
+  "version": "1.17.4",
   "scripts": {
     "dev:spotlight": "spotlight-sidecar",
     "dev:next": "next dev",

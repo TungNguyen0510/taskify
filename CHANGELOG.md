@@ -1,3 +1,10 @@
+## [1.17.4](https://github.com/TungNguyen0510/taskify/compare/v1.17.3...v1.17.4) (2024-09-19)
+
+
+### Bug Fixes
+
+* avatar name ([cb573a0](https://github.com/TungNguyen0510/taskify/commit/cb573a01e7610492167c7cc78fdae40f2857d582))
+
 ## [1.17.3](https://github.com/TungNguyen0510/taskify/compare/v1.17.2...v1.17.3) (2024-09-19)
 
 
