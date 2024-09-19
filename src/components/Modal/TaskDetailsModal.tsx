@@ -399,6 +399,15 @@ function TaskDetailsModal(props: TaskDetailsModalProps) {
       isOpen={isOpen}
       onClose={() => {
         useTasksStore.getState().taskDetails = null;
+        setNewStartDate(null);
+        setNewDueDate(null);
+        setNewProgress(null);
+        setNewAssignee(null);
+        setIsEditStartDate(false);
+        setIsEditDueDate(false);
+        setIsEditAssignee(false);
+        setIsEditSummary(false);
+        setIsEditAssignee(false);
         onClose();
       }}
     >
