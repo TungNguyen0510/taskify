@@ -22,7 +22,7 @@ function AvatarUser(props: AvatarUserProps) {
         size="sm"
         name={
           currentUser?.first_name && currentUser?.last_name
-            ? getInitialsName(currentUser.first_name, currentUser.first_name)
+            ? getInitialsName(currentUser.first_name, currentUser.last_name)
             : ''
         }
         showFallback
