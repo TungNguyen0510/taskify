@@ -1,3 +1,10 @@
+## [1.17.2](https://github.com/TungNguyen0510/taskify/compare/v1.17.1...v1.17.2) (2024-09-19)
+
+
+### Bug Fixes
+
+* sort items ([2bc655d](https://github.com/TungNguyen0510/taskify/commit/2bc655d837741d8e31f3450b67c55fee68ccf137))
+
 ## [1.17.1](https://github.com/TungNguyen0510/taskify/compare/v1.17.0...v1.17.1) (2024-09-19)
 
 
