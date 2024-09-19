@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/TungNguyen0510/taskify/compare/v1.17.0...v1.17.1) (2024-09-19)
+
+
+### Bug Fixes
+
+* remove unused code ([6c1a107](https://github.com/TungNguyen0510/taskify/commit/6c1a1071b38bf6847942d634fe7c3f915d66154e))
+
 # [1.17.0](https://github.com/TungNguyen0510/taskify/compare/v1.16.2...v1.17.0) (2024-09-17)
 
 
