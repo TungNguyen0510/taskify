@@ -363,40 +363,6 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
     if (!isActiveATask) return;
 
     if (isActiveATask && isOverATask) {
-      // Filter tasks for columnId before find index
-
-      // const columnIdHasActiveTask = tasks.find(
-      //   (task) => task.id === activeId,
-      // )?.column_id;
-
-      // const columnIdHasOverTask = tasks.find(
-      //   (task) => task.id === overId,
-      // )?.column_id;
-
-      // const listTaskOfActiveTask = tasks.filter(
-      //   (task) => task.column_id === columnIdHasActiveTask,
-      // );
-
-      // const listTaskOfOverTask = tasks.filter(
-      //   (task) => task.column_id === columnIdHasOverTask,
-      // );
-
-      // console.log('listTaskOfActiveTask', listTaskOfActiveTask);
-      // console.log('listTaskOfOverTask', listTaskOfOverTask);
-
-      // const activeTaskIndex = listTaskOfActiveTask.findIndex(
-      //   (task) => task.id === activeId,
-      // );
-
-      // const overTaskIndex = listTaskOfOverTask.findIndex(
-      //   (task) => task.id === overId,
-      // );
-
-      // console.log('activeId', activeId);
-      // console.log('overId', overId);
-      // console.log('activeTaskIndex', activeTaskIndex);
-      // console.log('overTaskIndex', overTaskIndex);
-
       const activeTaskIndex = filteredItems.findIndex(
         (task) => task.id === activeId,
       );
@@ -406,21 +372,6 @@ function KanbanBoard({ params }: { params: { projectId: string } }) {
       );
 
       try {
-        // if (columnIdHasActiveTask === columnIdHasOverTask) {
-        //   await updatePositionTask(
-        //     activeId,
-        //     listTaskOfActiveTask[activeTaskIndex]!.column_id,
-        //     listTaskOfActiveTask[overTaskIndex]!.pos,
-        //   );
-        //   await updatePositionTask(
-        //     overId,
-        //     listTaskOfActiveTask[overTaskIndex]!.column_id,
-        //     listTaskOfActiveTask[activeTaskIndex]!.pos,
-        //   );
-
-        //   await fetchListTasks(params.projectId);
-        // }
-
         await updatePositionTask(
           activeId,
           filteredItems[activeTaskIndex]!.column_id,

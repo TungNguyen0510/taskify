@@ -191,7 +191,6 @@ export default function ListTasks({
   }));
 
   const [filterValue, setFilterValue] = useState('');
-  // const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
 
   const [visibleColumns, setVisibleColumns] = useState(
     new Set(INITIAL_VISIBLE_COLUMNS),
@@ -280,10 +279,6 @@ export default function ListTasks({
             </div>
           </div>
         );
-      // case 'summary':
-      //   return (
-      //     <div className="flex max-w-[400px] items-center">{task.summary}</div>
-      //   );
       case 'assignee':
         return (
           <div>
@@ -291,7 +286,7 @@ export default function ListTasks({
               <AvatarUser userId={task.assignee} />
             ) : (
               <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
-                None
+                Unassigned
               </div>
             )}
           </div>
@@ -467,9 +462,9 @@ export default function ListTasks({
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex items-end justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <Input
-            className="w-full sm:max-w-[34%]"
+            className="w-full sm:max-w-[240px]"
             placeholder="Search by summary..."
             startContent={<Icon name="search" />}
             value={filterValue}
@@ -488,7 +483,7 @@ export default function ListTasks({
               </DropdownTrigger>
               <DropdownMenu
                 disallowEmptySelection
-                aria-label="Table Columns"
+                aria-label="Table Status"
                 closeOnSelect={false}
                 selectedKeys={statusFilter}
                 selectionMode="multiple"
@@ -531,6 +526,7 @@ export default function ListTasks({
             </Dropdown>
             <Button
               color="primary"
+              className="min-w-[142px]"
               endContent={<Icon name="plus" />}
               onClick={() => setIsOpenCreateTaskModal(true)}
             >
@@ -541,12 +537,8 @@ export default function ListTasks({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-small text-default-400">
-              Total {tasks.length} tasks
+              Total {filteredItems.length} tasks
             </span>
-
-            {/* {Array.from(selectedKeys).length > 0 ? (
-              <Button color="primary">Move tasks to Backlog</Button>
-            ) : null} */}
           </div>
           <label className="flex items-center text-small text-default-400">
             Rows per page:
@@ -575,11 +567,6 @@ export default function ListTasks({
   const bottomContent = useMemo(() => {
     return (
       <div className="flex items-center justify-between p-2">
-        {/* <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === 'all'
-            ? 'All items selected'
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span> */}
         <Pagination
           isCompact
           showControls

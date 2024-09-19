@@ -284,7 +284,7 @@ export default function BacklogPage({
               <AvatarUser userId={task.assignee} />
             ) : (
               <div className="w-fit rounded-md bg-zinc-200 px-2 py-1 hover:text-zinc-900">
-                None
+                Unassigned
               </div>
             )}
           </div>
@@ -421,7 +421,7 @@ export default function BacklogPage({
       <div className="flex flex-col gap-4">
         <div className="flex items-end justify-between gap-3">
           <Input
-            className="w-full sm:max-w-[34%]"
+            className="w-full sm:max-w-[240px]"
             placeholder="Search by summary..."
             startContent={<Icon name="search" />}
             value={filterValue}
@@ -514,11 +514,6 @@ export default function BacklogPage({
   const bottomContent = useMemo(() => {
     return (
       <div className="flex items-center justify-between p-2">
-        {/* <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === 'all'
-            ? 'All items selected'
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span> */}
         <Pagination
           isCompact
           showControls

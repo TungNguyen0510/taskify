@@ -4,22 +4,33 @@
 
 import 'gantt-task-react/dist/index.css';
 
-import { Spinner } from '@nextui-org/react';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Spinner,
+} from '@nextui-org/react';
 import { Gantt, ViewMode } from 'gantt-task-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import TaskDetailsModal from '@/components/Modal/TaskDetailsModal';
 import { useColumnsStore } from '@/stores/columns';
 import { useProjectsStore } from '@/stores/projects';
 import { useTasksStore } from '@/stores/tasks';
 import { useUsersStore } from '@/stores/users';
+import type { Column } from '@/types/board';
+import { capitalize } from '@/utils/Helpers';
 
+import Icon from '../Icon';
 import { ViewSwitcher } from './ViewSwitcher';
 
 function TimelinePage({ params }: { params: { projectId: string } }) {
   const { tasks, fetchListTasks, updateTaskDetails } = useTasksStore();
   const { fetchListUsers } = useUsersStore();
-  const { fetchListColumns } = useColumnsStore();
+  const { columns, fetchListColumns } = useColumnsStore();
   const { currentProject, fetchCurrentProject } = useProjectsStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +64,63 @@ function TimelinePage({ params }: { params: { projectId: string } }) {
     setIsLoading(false);
   }, []);
 
-  const tranferTasks = tasks
+  const [filterValue, setFilterValue] = useState('');
+
+  const [statusFilter, setStatusFilter] = useState(
+    new Set(columns.map((item) => item.id)),
+  );
+
+  useEffect(() => {
+    setStatusFilter(new Set(columns.map((item) => item.id)));
+  }, [columns]);
+
+  const getStatusColor = (column: Column) => {
+    if (column.isDone) {
+      return 'success';
+    }
+    if (column.isTodo) {
+      return 'default';
+    }
+    return 'primary';
+  };
+
+  const statusOptions = columns.map((column) => ({
+    uid: column.id,
+    name: column.status,
+    color: getStatusColor(column),
+  }));
+
+  const onClear = useCallback(() => {
+    setFilterValue('');
+  }, []);
+
+  const onSearchChange = useCallback((value: any) => {
+    if (value) {
+      setFilterValue(value);
+    } else {
+      setFilterValue('');
+    }
+  }, []);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const filteredItems = useMemo(() => {
+    let filteredTasks = [...tasks];
+
+    if (hasSearchFilter) {
+      filteredTasks = filteredTasks.filter((task) =>
+        task.summary.toLowerCase().includes(filterValue.toLowerCase()),
+      );
+    }
+
+    filteredTasks = filteredTasks.filter((task) =>
+      Array.from(statusFilter).includes(task.column_id),
+    );
+
+    return filteredTasks;
+  }, [tasks, filterValue, statusFilter]);
+
+  const tranferTasks = filteredItems
     .sort(
       (a, b) =>
         new Date(a.date_created).getTime() - new Date(b.date_created).getTime(),
@@ -152,6 +219,41 @@ function TimelinePage({ params }: { params: { projectId: string } }) {
         onViewListChange={setIsChecked}
         isChecked={isChecked}
       />
+
+      <div className="flex gap-4 pb-4">
+        <Input
+          className="w-full sm:max-w-[240px]"
+          placeholder="Search by summary..."
+          startContent={<Icon name="search" />}
+          value={filterValue}
+          onClear={() => onClear()}
+          onValueChange={onSearchChange}
+        />
+
+        <Dropdown>
+          <DropdownTrigger className="hidden sm:flex">
+            <Button endContent={<Icon name="ChevronDownIcon" />} variant="flat">
+              Status
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            disallowEmptySelection
+            aria-label="Table Status"
+            closeOnSelect={false}
+            selectedKeys={statusFilter}
+            selectionMode="multiple"
+            onSelectionChange={(keys: 'all' | Set<React.Key>) =>
+              setStatusFilter(keys as any)
+            }
+          >
+            {statusOptions.map((status) => (
+              <DropdownItem key={status.uid} className="capitalize">
+                {capitalize(status.name)}
+              </DropdownItem>
+            ))}
+          </DropdownMenu>
+        </Dropdown>
+      </div>
 
       <Gantt
         tasks={tranferTasks}

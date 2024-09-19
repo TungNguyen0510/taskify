@@ -855,7 +855,7 @@ function TaskPage({
                             <AvatarUser userId={taskDetails.assignee} />
                           ) : (
                             <div className="w-full rounded-md px-2 py-1 hover:bg-zinc-100 hover:text-zinc-900">
-                              None
+                              Unassigned
                             </div>
                           )}
                         </div>

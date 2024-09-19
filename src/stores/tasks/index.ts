@@ -76,6 +76,15 @@ export const useTasksStore = create<State & Actions>()(
         },
 
         deleteTask: async (taskId: any) => {
+          await api.delete('/items/ActivityLog', {
+            query: {
+              filter: {
+                resource_id: {
+                  _eq: taskId,
+                },
+              },
+            },
+          });
           await api.delete(`/items/Task/${taskId}`);
         },
 

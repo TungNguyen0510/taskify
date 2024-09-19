@@ -79,7 +79,42 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
       }
 
       return {
-        y: (count / totalTasks) * 100,
+        y: Math.round((count / totalTasks) * 100 * 100) / 100,
+        label,
+      };
+    });
+
+    return result;
+  }
+
+  function calculateOpenTasksNumber(): Result[] {
+    const taskCountMap: Record<string, number> = tasks
+      .filter((task) => task.isDone !== true)
+      .reduce(
+        (acc, task) => {
+          const assignee = task.assignee || 'unassigned';
+          if (!acc[assignee]) {
+            acc[assignee] = 0;
+          }
+          acc[assignee] += 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+    const result = Object.entries(taskCountMap).map(([assignee, count]) => {
+      let label = 'Unassigned';
+
+      if (assignee !== 'unassigned') {
+        const user = users.find((u) => u.id === assignee);
+        label =
+          user.first_name && user.last_name
+            ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
+            : 'Unknown';
+      }
+
+      return {
+        y: count,
         label,
       };
     });
@@ -103,7 +138,10 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
     });
     const result = columns.map((column) => ({
       label: column.status,
-      y: ((statusCountMap[column.status] || 0) / totalTasks) * 100,
+      y:
+        Math.round(
+          ((statusCountMap[column.status] || 0) / totalTasks) * 100 * 100,
+        ) / 100,
     }));
 
     return result;
@@ -129,6 +167,29 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
     ],
   };
 
+  const openTasksNumberOptions = {
+    animationEnabled: true,
+    theme: 'light2',
+    title: {
+      text: '',
+    },
+    axisX: {
+      title: '',
+      reversed: true,
+    },
+    axisY: {
+      title: '',
+      includeZero: true,
+      interval: 1,
+    },
+    data: [
+      {
+        type: 'bar',
+        dataPoints: calculateOpenTasksNumber(),
+      },
+    ],
+  };
+
   const workloadStatusOptions = {
     animationEnabled: true,
     exportEnabled: true,
@@ -146,7 +207,7 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
         showInLegend: true,
         indexLabel: '{label}: {y}',
         legendText: '{label}',
-        yValueFormatString: "#,###'%'",
+        yValueFormatString: "#,##'%'",
         dataPoints: calculateStatusPercentage(),
       },
     ],
@@ -198,11 +259,22 @@ function DashboardPage({ params }: { params: { projectId: string } }) {
 
       <Card className="flex grow">
         <CardHeader>
-          <div className="font-semibold">Total tasks by Assignee</div>
+          <div className="font-semibold">Total Tasks by Assignee</div>
         </CardHeader>
         <CardBody>
           <div>
             <CanvasJSChart options={pieAssigneeOptions} />
+          </div>
+        </CardBody>
+      </Card>
+
+      <Card className="flex grow">
+        <CardHeader>
+          <div className="font-semibold">Open Tasks by Assignee</div>
+        </CardHeader>
+        <CardBody>
+          <div>
+            <CanvasJSChart options={openTasksNumberOptions} />
           </div>
         </CardBody>
       </Card>
