@@ -1,3 +1,10 @@
+## [1.17.3](https://github.com/TungNguyen0510/taskify/compare/v1.17.2...v1.17.3) (2024-09-19)
+
+
+### Bug Fixes
+
+* clear state modal task details on close ([256b114](https://github.com/TungNguyen0510/taskify/commit/256b114fff449bd99ca35c8ed2954c9bbbf8022a))
+
 ## [1.17.2](https://github.com/TungNguyen0510/taskify/compare/v1.17.1...v1.17.2) (2024-09-19)
 
 
